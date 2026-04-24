@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "way-stack",
+  "description": "One-command Claude Code power setup: master orchestrator, PARA + Karpathy vault, SDD agent factory, session hooks, and auto-install of 5 upstream plugins + 7 design skills.",
+  "owner": {
+    "name": "lcwy9671",
+    "url": "https://github.com/lcwy9671"
+  },
+  "plugins": [
+    {
+      "name": "way-stack",
+      "description": "Meta-plugin that bootstraps a full Claude Code dev stack in two commands. Orchestrator, vault, SDD flow, hooks, upstream deps.",
+      "source": "./",
+      "category": "meta"
+    }
+  ]
+}
