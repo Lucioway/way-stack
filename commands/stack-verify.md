@@ -17,11 +17,16 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 4. **Hooks registered** — `~/.claude/settings.json` has `SessionEnd` entries pointing to both hook scripts.
 
-5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`.
+5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`, `caveman`.
 
 6. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `hooked-ux`, `design-sprint`, `ios-hig-design`, `ui-ux-pro-max`. (`frontend-design` is plugin-level, not listed here.)
 
-7. **Vault git repo** — `$VAULT/.git` exists (auto-backup hook no-op without it).
+7. **Frameworks** (optional, ⚠ if missing — not ✗):
+   - GSD: `~/.claude/get-shit-done/VERSION` exists + `~/.claude/skills/gsd-plan-phase/SKILL.md` present
+   - BMAD: `~/.claude/skills/bmad/core/bmad-master/SKILL.md` present
+   - gstack: `~/.claude/skills/gstack/package.json` present + `browse/dist/browse` binary executable
+
+8. **Vault git repo** — `$VAULT/.git` exists (auto-backup hook no-op without it).
 
 ## Output format
 
@@ -32,9 +37,10 @@ way-stack verify
 ✓ Orchestrator   — ~/.claude/CLAUDE.md (42 routing rules)
 ✓ Hooks          — session-log + auto-backup, both +x
 ✓ Hooks registered — SessionEnd wired
-✓ Plugins        — 5/5 installed
+✓ Plugins        — 6/6 installed
 ⚠ Design skills  — 6/6 present, ui-ux-pro-max SKILL.md missing
+✓ Frameworks     — GSD ✓ BMAD ✓ gstack ✓
 ✓ Vault git      — 12 commits
 
-Result: 6 ✓, 1 ⚠ — mostly healthy. Fix: re-run /stack-bootstrap step 9.
+Result: 7 ✓, 1 ⚠ — mostly healthy. Fix: re-run /stack-bootstrap step 9.
 ```

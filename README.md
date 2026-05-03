@@ -1,8 +1,8 @@
 # way-stack
 
-**One-command Claude Code power setup.** Bootstraps a full dev stack: master orchestrator, PARA + Karpathy LLM Wiki vault, Spec-Driven Development (SDD) agent factory, session-persistence hooks, and 5 upstream plugins + 7 design skills wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator, PARA + Karpathy LLM Wiki vault, Spec-Driven Development (SDD) agent factory, session-persistence hooks, 6 upstream plugins, 7 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
 
-Designed for new Claude Code users who want the full "pro" setup in two commands, without hand-assembling a dozen marketplaces.
+Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
 ## What you get
 
@@ -13,17 +13,18 @@ Designed for new Claude Code users who want the full "pro" setup in two commands
 | **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd` |
 | **Agent factory** | `/agent-spec` → `/agent-tasks` → `/agent-execute` → `/agent-verify` → `/agent-ship` — full SDD flow |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
-| **Plugins installed** | superpowers, frontend-design, code-review, cli-anything, ralph-loop |
+| **Plugins installed** | superpowers, frontend-design, code-review, cli-anything, ralph-loop, caveman |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
+| **Frameworks (optional)** | GSD (~70 `gsd-*` skills), BMAD v6 (9 `bmad:*` skills), gstack (~38 skills + headless browser) |
 
-## Install
+## Install — 3 commands
 
 ### 1. Add marketplace + install way-stack
 
 In Claude Code:
 
 ```
-/plugin marketplace add lcwy9671/way-stack
+/plugin marketplace add Lucioway/way-stack
 /plugin install way-stack
 ```
 
@@ -33,7 +34,7 @@ In Claude Code:
 /stack-bootstrap
 ```
 
-It will ask once where your vault should live (default `~/Workspace`), then install everything.
+It will ask once where your vault should live (default `~/Workspace`), then install everything. Asks once whether to install the heavyweight frameworks (GSD/BMAD/gstack) — default = all.
 
 ### 3. Verify
 
@@ -78,10 +79,14 @@ way-stack/
 | code-review | anthropics/claude-plugins | Multi-agent parallel review |
 | cli-anything | HKUDS/CLI-Anything | GUI-OSS CLI wrappers |
 | ralph-loop | anthropics/claude-plugins | Autonomous iteration loop |
+| caveman | JuliusBrussee/claude-code-caveman | Terse-mode prompt compression |
 | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |
+| **GSD** (optional) | gsd-build/get-shit-done (`npx get-shit-done-cc --claude --global`) | Spec-driven dev framework, ~70 skills |
+| **BMAD v6** (optional) | bmad-code-org/BMAD-METHOD (`npx bmad-method install`) | Agile multi-role methodology, 9 skills |
+| **gstack** (optional) | garrytan/gstack (git clone + `./setup`) | Garry Tan's virtual team, ~38 skills + browser |
 
-way-stack does NOT redistribute these — it adds their marketplaces and installs them at bootstrap time. They stay on their own update tracks.
+way-stack does NOT redistribute these — it adds their marketplaces / runs their canonical installers at bootstrap time. They stay on their own update tracks.
 
 ## Philosophy
 

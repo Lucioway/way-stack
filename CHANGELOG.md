@@ -2,6 +2,25 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.1.0 — 2026-05-03
+
+### Added
+- `/stack-bootstrap` STEP 10 — optional install of three heavyweight frameworks:
+  - **GSD** (`gsd-build/get-shit-done`) via `npx get-shit-done-cc --claude --global`
+  - **BMAD v6** (`bmad-code-org/BMAD-METHOD`) via `npx bmad-method install`
+  - **gstack** (`garrytan/gstack`) via git clone + `./setup`
+- `caveman` plugin (`JuliusBrussee/claude-code-caveman`) added to STEP 8 install list — marketplace was already registered in STEP 7 but plugin was never installed
+- `/stack-verify` — new check #7 confirms framework presence (warn-only, not fail)
+
+### Changed
+- README "What you get" + "Upstream dependencies" sections list new plugins/frameworks
+- Bootstrap is now an 11-step flow (was 10)
+- Plugin description updated: "6 plugins" + "3 frameworks"
+- README install line corrected: `Lucioway/way-stack` (was `lcwy9671/way-stack` — wrong owner)
+
+### Why
+Goal: a single link that replicates the entire operational Claude stack on a fresh machine. v1.0.x covered orchestrator + vault + 5 plugins + design skills, but missed the three frameworks (GSD/BMAD/gstack) that the orchestrator routes to. Replica was incomplete.
+
 ## v1.0.1 — 2026-04-24
 
 ### Added

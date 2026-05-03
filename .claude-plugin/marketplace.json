@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "way-stack",
-  "description": "One-command Claude Code power setup: master orchestrator, PARA + Karpathy vault, SDD agent factory, session hooks, and auto-install of 5 upstream plugins + 7 design skills.",
+  "description": "Three-command Claude Code stack replicator: master orchestrator, PARA + Karpathy vault, SDD agent factory, session hooks, auto-install of 6 upstream plugins, 7 design skills, and 3 optional frameworks (GSD, BMAD, gstack).",
   "owner": {
     "name": "Lucioway",
     "url": "https://github.com/Lucioway"
