@@ -13,9 +13,11 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd` |
 | **Agent factory** | `/agent-spec` → `/agent-tasks` → `/agent-execute` → `/agent-verify` → `/agent-ship` — full SDD flow |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
-| **Plugins installed** | superpowers, frontend-design, code-review, cli-anything, ralph-loop, caveman |
+| **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory) |
+| **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
-| **Frameworks (optional)** | GSD (~70 `gsd-*` skills), BMAD v6 (9 `bmad:*` skills), gstack (~38 skills + headless browser) |
+| **Bundled skills** | create-agent, vault-ingest, vault-query, vault-lint, **handoff** |
+| **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
 
 ## Install — 3 commands
 
@@ -74,12 +76,13 @@ way-stack/
 
 | Dependency | Source | Purpose |
 |---|---|---|
-| superpowers | obra/superpowers-marketplace | TDD, debug, brainstorming, worktrees |
-| frontend-design | anthropics/claude-plugins | Production-grade UI generation |
-| code-review | anthropics/claude-plugins | Multi-agent parallel review |
+| superpowers | anthropics/claude-plugins-official | TDD, debug, brainstorming, worktrees, verification-before-completion, dispatching-parallel-agents |
+| frontend-design | anthropics/claude-plugins-official | Production-grade UI generation |
+| code-review | anthropics/claude-plugins-official | Multi-agent parallel review |
+| ralph-loop | anthropics/claude-plugins-official | Autonomous iteration loop |
 | cli-anything | HKUDS/CLI-Anything | GUI-OSS CLI wrappers |
-| ralph-loop | anthropics/claude-plugins | Autonomous iteration loop |
-| caveman | JuliusBrussee/claude-code-caveman | Terse-mode prompt compression |
+| **claude-mem** | thedotmack/claude-mem | Persistent auto-memory across sessions (`$cmem` recap, typed memory files) |
+| caveman (hook-based) | JuliusBrussee/claude-code-caveman | Terse-mode prompt compression — installed via its own `install.sh` |
 | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |
 | **GSD** (optional) | gsd-build/get-shit-done (`npx get-shit-done-cc --claude --global`) | Spec-driven dev framework, ~70 skills |

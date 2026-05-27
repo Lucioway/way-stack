@@ -13,12 +13,14 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 ## TOOLING INVENTORY
 
 ### Plugins (global, auto-activate)
-- **way-stack** — this meta-plugin (orchestrator + vault skills + agent factory)
-- **superpowers** — TDD, debug, brainstorming, worktrees, subagent-driven-dev
+- **way-stack** — this meta-plugin (orchestrator + vault skills + agent factory + handoff)
+- **superpowers** — TDD, debug, brainstorming, worktrees, subagent-driven-dev, verification-before-completion, dispatching-parallel-agents, writing-skills, executing-plans
 - **frontend-design** — production-grade UI generation (triggers: "build UI", "design this")
 - **code-review** — parallel multi-agent review (`/code-review:code-review`)
 - **cli-anything** — CLI wrappers for GUI OSS (GIMP, Blender, LibreOffice…)
 - **ralph-loop** — autonomous iteration loop, clean context per iter
+- **claude-mem** (`thedotmack/claude-mem`) — persistent auto-memory across sessions; injects `$cmem` recap at session start; per-project memory dir at `~/.claude/projects/<proj>/memory/MEMORY.md` (typed memories: user / feedback / project / reference)
+- **caveman** (hook-based, not plugin) — terse output mode; toggle `/caveman lite|full|ultra`, off via "stop caveman" / "normal mode"
 
 ### Design skills (auto by keyword)
 | Skill | Triggers |
@@ -37,11 +39,12 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 - `/agent-spec`, `/agent-tasks`, `/agent-execute`, `/agent-verify`, `/agent-ship` — SDD flow
 - Skill `create-agent` — Phase 0 intake (workflow → PROJECT_BRIEF.md)
 - Skills `vault-ingest`, `vault-query`, `vault-lint` — Karpathy LLM Wiki ops
+- Skill `handoff` — write `HANDOFF.md` so the next fresh-context agent can resume
 
 ### Frameworks (optional, prefix = namespace)
-- **GSD** (`gsd-*`, if installed) — atomic commits, sub-agent isolation, structured solo dev
-- **BMAD** (`bmad:*`, if installed) — agile multi-role (analyst→PM→arch→dev)
-- **gstack** (if installed) — full virtual team (CEO/eng/QA/design/security)
+- **GSD** (`gsd-*`, if installed) — atomic commits, sub-agent isolation, structured solo dev. 90+ skills (`gsd-new-project`, `gsd-discuss-phase`, `gsd-plan-phase`, `gsd-execute-phase`, `gsd-verify-work`, `gsd-code-review`, `gsd-ship`, `gsd-autonomous`, `gsd-thread`, `gsd-list-workspaces`, `gsd-set-profile`, `gsd-profile-user`, …)
+- **BMAD** (`bmad:*`, if installed) — agile multi-role (analyst→PM→arch→dev). 15 skills
+- **gstack** (if installed) — full virtual team (CEO/eng/QA/design/security). 38 skills + headless `browse` binary
 
 ## ROUTING DECISION TREE
 
@@ -109,7 +112,9 @@ Greenfield — pick by size:
 7. Unsure? Ask user once with 3-option menu tied to size.
 8. Touching UI → `frontend-design` auto-skill activates.
 9. Before shipping → code-review + QA.
-10. Read `~/.claude/projects/<proj>/memory/MEMORY.md` first every session.
+10. Read `~/.claude/projects/<proj>/memory/MEMORY.md` first every session (claude-mem injects it as `$cmem` recap).
+11. **Mandatory skill check** (`superpowers:using-superpowers`): if there is even a 1% chance a skill applies, you MUST invoke it via the `Skill` tool BEFORE responding. Not optional.
+12. End of session / handing off work → `/handoff` to write `HANDOFF.md` for the next fresh-context agent.
 
 ## QUICK CHEATSHEET
 
@@ -130,6 +135,9 @@ Greenfield — pick by size:
 | what do we know about X | `vault-query` |
 | vault health check | `vault-lint` |
 | ship | `/agent-ship` or framework equivalent |
+| stopping mid-task, fresh chat tomorrow | `/handoff` (writes `HANDOFF.md`) |
+| terse mode / less filler | `/caveman full` (off: "stop caveman") |
+| what does the system remember about me | check `$cmem` recap at session start OR read `~/.claude/projects/<proj>/memory/MEMORY.md` |
 
 ## ANNOUNCEMENT PROTOCOL
 

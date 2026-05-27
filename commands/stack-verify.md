@@ -17,16 +17,22 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 4. **Hooks registered** — `~/.claude/settings.json` has `SessionEnd` entries pointing to both hook scripts.
 
-5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`, `caveman`.
+5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`, `claude-mem`.
 
-6. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `hooked-ux`, `design-sprint`, `ios-hig-design`, `ui-ux-pro-max`. (`frontend-design` is plugin-level, not listed here.)
+6. **Caveman installed** (hook-based, not plugin) — `~/.claude/hooks/caveman-activate.js` + `~/.claude/hooks/caveman-mode-tracker.js` exist and are referenced in `~/.claude/settings.json` SessionStart + UserPromptSubmit.
 
-7. **Frameworks** (optional, ⚠ if missing — not ✗):
+7. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `hooked-ux`, `design-sprint`, `ios-hig-design`, `ui-ux-pro-max`. (`frontend-design` is plugin-level, not listed here.)
+
+8. **Handoff skill** — `~/.claude/skills/handoff/SKILL.md` exists.
+
+9. **Frameworks** (optional, ⚠ if missing — not ✗):
    - GSD: `~/.claude/get-shit-done/VERSION` exists + `~/.claude/skills/gsd-plan-phase/SKILL.md` present
    - BMAD: `~/.claude/skills/bmad/core/bmad-master/SKILL.md` present
    - gstack: `~/.claude/skills/gstack/package.json` present + `browse/dist/browse` binary executable
 
-8. **Vault git repo** — `$VAULT/.git` exists (auto-backup hook no-op without it).
+10. **Vault git repo** — `$VAULT/.git` exists (auto-backup hook no-op without it).
+
+11. **Auto-memory dir** — `~/.claude/projects/` exists (claude-mem auto-populates per-project memory dirs on first session).
 
 ## Output format
 
