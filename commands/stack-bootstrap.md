@@ -5,7 +5,7 @@ description: "One-shot installer for the full way-stack — creates PARA+Karpath
 
 # /stack-bootstrap — Full Stack Installer
 
-You are the way-stack bootstrap installer. Execute the 13-step install in order. Halt on any error and report which step failed. Never skip verification.
+You are the way-stack bootstrap installer. Execute the 14-step install in order. Halt on any error and report which step failed. Never skip verification.
 
 ## STEP 1 — Ask vault path
 
@@ -172,7 +172,56 @@ touch ~/.claude/projects/.gitkeep
 
 Per-project `memory/MEMORY.md` index files are auto-created by `claude-mem` on first session start. Nothing else to do here.
 
-## STEP 13 — Verify install
+## STEP 13 — Install Graphify (knowledge-graph MCP)
+
+`graphify` (safishamsi/graphifyy) builds a knowledge graph from any folder of `.md`/`.json`/code files and exposes it to Claude via MCP. It replaces hand-curated wikilinks: instead of you maintaining `[[links]]`, Graphify infers the graph structurally — cross-entity traversal, shortest path, god-nodes detection — and Claude queries it natively.
+
+### 13a — Install CLI
+
+```bash
+# Preferred: uv tool install (isolated venv)
+uv tool install graphifyy 2>/dev/null || pip install --user graphifyy
+```
+
+### 13b — Install Claude Code skill
+
+```bash
+graphify install --platform claude
+```
+
+Adds `/graphify` skill to `~/.claude/skills/graphify/` so you can build graphs by running `cd <folder> && /graphify .` inside Claude Code.
+
+### 13c — Register cross-vault MCP server (optional, recommended)
+
+If the user wants Graphify queryable directly from any Claude session via MCP tools (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`):
+
+```bash
+# Find graphifyy install path (uv or pip)
+GRAPHIFY_PY="$(uv tool dir 2>/dev/null)/graphifyy/bin/python"
+[ ! -x "$GRAPHIFY_PY" ] && GRAPHIFY_PY="$(python3 -c 'import sys; print(sys.executable)')"
+
+# Register MCP server at user scope, pointed at vault graph (built on first /graphify run)
+claude mcp add graphify-vault \
+  --scope user \
+  -- "$GRAPHIFY_PY" -m graphify.serve "$VAULT/graphify-out/graph.json"
+```
+
+If `$VAULT/graphify-out/graph.json` doesn't exist yet, the MCP server starts but returns empty results until the user runs `/graphify .` once inside the vault.
+
+If `claude mcp add` is not yet available in the installed CLI version, instead patch `~/.claude.json` manually:
+
+```json
+"mcpServers": {
+  "graphify-vault": {
+    "type": "stdio",
+    "command": "<GRAPHIFY_PY>",
+    "args": ["-m", "graphify.serve", "<VAULT>/graphify-out/graph.json"],
+    "env": {}
+  }
+}
+```
+
+## STEP 14 — Verify install
 
 Run `/stack-verify`. Report pass/fail summary to user:
 
@@ -185,6 +234,7 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ 7 design skills fetched
 ✓ handoff skill bundled
 ✓ Frameworks: GSD ✓ BMAD ✓ gstack ✓
+✓ Graphify CLI + skill + MCP server registered
 ⚠ 1 skill failed (nextlevelbuilder moved) — install manually
 ```
 

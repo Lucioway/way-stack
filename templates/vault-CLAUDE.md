@@ -1,6 +1,6 @@
 # Workspace Vault — PARA + Karpathy LLM Wiki
 
-This is the user's knowledge vault. Obsidian-compatible. Append-only log, catalog-first retrieval.
+This is the user's knowledge vault. Plain markdown, Graphify-indexed. Append-only log, catalog-first retrieval.
 
 ## Layout
 
@@ -43,7 +43,7 @@ tags: [tag1, tag2]
 
 ## Linking
 
-- Use `[[wikilink]]` Obsidian syntax
+- Use `[[wikilink]]` syntax for human-readable cross-refs (Graphify also infers structural links automatically)
 - From `01_PROJECTS/<project>.md` → link retro / pattern / learning for that project
 - From pattern → link projects that use it
 

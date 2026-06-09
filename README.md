@@ -15,6 +15,7 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
 | **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
+| **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
 | **Bundled skills** | create-agent, vault-ingest, vault-query, vault-lint, **handoff** |
 | **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
@@ -83,6 +84,7 @@ way-stack/
 | cli-anything | HKUDS/CLI-Anything | GUI-OSS CLI wrappers |
 | **claude-mem** | thedotmack/claude-mem | Persistent auto-memory across sessions (`$cmem` recap, typed memory files) |
 | caveman (hook-based) | JuliusBrussee/claude-code-caveman | Terse-mode prompt compression — installed via its own `install.sh` |
+| **graphify** | safishamsi/graphifyy (pip `graphifyy`) | Knowledge-graph builder + MCP server. `/graphify .` extracts entities/edges from any folder; MCP exposes graph to Claude (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`) |
 | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |
 | **GSD** (optional) | gsd-build/get-shit-done (`npx get-shit-done-cc --claude --global`) | Spec-driven dev framework, ~70 skills |

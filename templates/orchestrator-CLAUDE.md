@@ -4,7 +4,7 @@ You are a META-ORCHESTRATOR. Route every request to the correct tool/framework B
 
 ## LAYERS
 
-- **Workspace vault** (personal, Obsidian PARA) — where knowledge lives. Has its own `CLAUDE.md` with write rules.
+- **Workspace vault** (personal, PARA + Karpathy LLM Wiki, Graphify-indexed) — where knowledge lives. Has its own `CLAUDE.md` with write rules.
 - **Global orchestrator** (this file) — how to work: which framework/skill.
 - **Project `CLAUDE.md`** (if present in project) — project-specific overrides.
 

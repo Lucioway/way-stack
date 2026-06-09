@@ -34,6 +34,8 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 11. **Auto-memory dir** — `~/.claude/projects/` exists (claude-mem auto-populates per-project memory dirs on first session).
 
+12. **Graphify** — `graphify` CLI on `$PATH` (`command -v graphify`) + `~/.claude/skills/graphify/` exists + `~/.claude.json` `mcpServers.graphify-vault` (or equivalent) registered. ⚠ if MCP server registered but `graph.json` doesn't exist yet — user just hasn't run `/graphify .` inside the vault.
+
 ## Output format
 
 ```

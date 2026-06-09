@@ -2,6 +2,34 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.3.1 — 2026-06-09
+
+### Changed
+- Repositioned vault layer: dropped "Obsidian" framing across README, bootstrap, templates, plugin keywords. The vault is plain markdown + Graphify-indexed. Graphify replaces hand-curated wikilinks with an inferred graph queryable from Claude via MCP.
+- `[[wikilink]]` syntax remains supported as a human-readable convention, but no longer requires an Obsidian client — Graphify infers the graph structurally.
+- Plugin keywords: removed `obsidian`.
+
+### Why
+The stack works with any editor. Tying it to Obsidian framed a tool dependency that doesn't exist. Graphify is the actual graph engine; the vault is just markdown files.
+
+## v1.3.0 — 2026-06-09
+
+### Added
+- **graphify** (`safishamsi/graphifyy`) — knowledge-graph layer. New STEP 13 in `/stack-bootstrap`:
+  - 13a installs `graphifyy` Python pkg via `uv tool install` (fallback `pip install --user`)
+  - 13b registers `/graphify` skill at `~/.claude/skills/graphify/` via `graphify install --platform claude`
+  - 13c registers `graphify-vault` MCP server at user scope, pointed at `$VAULT/graphify-out/graph.json` — exposes `query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes` to Claude as native tools.
+- `/stack-verify` — new check #12 confirms `graphify` CLI on PATH + skill dir + MCP server registered.
+- README: new "Knowledge-graph layer" row in `What you get` + new upstream-deps row.
+
+### Changed
+- Bootstrap: 13 steps → 14 steps.
+- Plugin description: mentions graphify (knowledge-graph MCP) alongside claude-mem and caveman.
+- Keywords: `graphify`, `knowledge-graph`, `mcp`.
+
+### Why
+Graphify replaces hand-curated wikilinks with an inferred graph layer: cross-entity traversal, shortest-path queries, god-nodes detection over the vault — all queryable from Claude as native MCP tools. After 5 weeks of daily use across 10+ brain knowledge bases, it's earned a slot in the canonical stack. The vault stays plain markdown; Graphify is the query layer.
+
 ## v1.2.0 — 2026-05-27
 
 ### Added
