@@ -48,6 +48,15 @@ python main.py --schedule         # Start the automatic scheduler
 13. **Never hardcode credentials** — always `.env`
 14. **Each agent is a SEPARATE project** — independent folder, own git history
 
+## The 4 permission levels
+
+Match the Claude Code permission level to the build phase:
+
+1. **Ask before edits** — to understand what it will do (initial phase)
+2. **Edit automatically** — for fast builds (construction phase)
+3. **Plan Mode** — for analysis and planning (design phase)
+4. **Bypass permissions** — for full uninterrupted builds (advanced phase)
+
 ## CLAUDE.md — the project brain
 
 - Injected at the start of EVERY Claude Code session
