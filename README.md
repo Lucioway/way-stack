@@ -13,12 +13,13 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd` |
 | **Agent factory** | `/agent-spec` → `/agent-tasks` → `/agent-execute` → `/agent-verify` → `/agent-ship` — full SDD flow + bundled references (full SDD framework w/ Mega Prompt, agent design principles, CLI tools stack) |
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
+| **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
 | **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
-| **Bundled skills** | create-agent, vault-ingest, vault-query, vault-lint, **handoff** |
+| **Bundled skills** | create-agent, **deploy-project**, vault-ingest, vault-query, vault-lint, **handoff** |
 | **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
 
 ## Install — 3 commands
@@ -58,6 +59,7 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 | "UI looks off, fix it" | `refactoring-ui` skill |
 | "what do we know about rate-limiting Gmail API?" | `vault-query` skill |
 | "save this article on RAG patterns" | `vault-ingest` skill |
+| "deploy this project: /path/to/app" | `deploy-project` skill — 10-step secure deploy to Vercel |
 | "new project, full web app, auth + payments" | orchestrator asks size → picks framework |
 
 ## Anatomy
@@ -66,10 +68,11 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 way-stack/
 ├── .claude-plugin/plugin.json
 ├── commands/              # /stack-bootstrap, /stack-verify, /agent-*
-├── skills/                # create-agent, vault-{ingest,query,lint}
+├── skills/                # create-agent, deploy-project, vault-{ingest,query,lint}
 ├── hooks/                 # session log + auto-backup
 ├── templates/             # orchestrator CLAUDE.md, vault CLAUDE.md, project CLAUDE.md,
-│   └── agent-monitor/     #   3D live dashboard for the agent fleet (monitor.py + Three.js)
+│   ├── agent-monitor/     #   3D live dashboard for the agent fleet (monitor.py + Three.js)
+│   └── deploy-agent/      #   scriptable deploy CLI (scan → audit → auth → git → Vercel)
 ├── references/            # SDD framework (full, w/ Mega Prompt), agent design principles, CLI tools stack
 ├── README.md
 └── LICENSE                # MIT

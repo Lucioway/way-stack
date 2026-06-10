@@ -1,0 +1,2 @@
+# DeployAgent has no Python dependencies beyond stdlib.
+# All heavy lifting is done via CLI tools: gh, vercel, npm.
