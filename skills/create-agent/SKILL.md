@@ -98,6 +98,16 @@ After `PROJECT_BRIEF.md` is written + committed:
 
 Do NOT continue into Phase 1 inside the same skill invocation. The SDD flow requires context reset between phases.
 
+## Deep references (bundled with the plugin)
+
+When you need more depth than this skill provides, read from the plugin's `references/` folder:
+
+- `references/sdd-framework.md` — full SDD framework: the 3 source frameworks, 6 phases, non-negotiable rules, personas, autonomous Ralph mode, and the **Mega Prompt** to embed in a generated agent's CLAUDE.md
+- `references/agent-design-principles.md` — required agent architecture, command surface, MCP-vs-Skills strategy, automation patterns, common mistakes
+- `references/tools-setup.md` — recommended CLI stack (OpenCLI, companion tools, Claude Code ecosystem)
+
+For fleet monitoring, scaffold from `templates/agent-monitor/` — a real-time 3D dashboard (WebSocket server + Three.js) tracking every generated agent's launchd/process/log state.
+
 ## Design principles (from the source framework)
 
 1. Plan Mode before Build — analyze before code

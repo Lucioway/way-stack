@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Network — Live Monitor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111827;font-family:'Inter',sans-serif;overflow:hidden;color:#fff}
+canvas{display:block}
+#c{width:100vw;height:100vh;position:fixed;top:0;left:0}
+
+#hud{position:fixed;top:28px;left:36px;z-index:10;pointer-events:none}
+#hud h1{font-size:26px;font-weight:700;letter-spacing:2px;background:linear-gradient(135deg,#a78bfa,#60a5fa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+#hud p{font-size:12px;color:#475569;letter-spacing:1px}
+#conn-status{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+#legend{position:fixed;top:28px;right:36px;z-index:10;pointer-events:none}
+.leg{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px;color:#64748b}
+.ld{width:8px;height:8px;border-radius:50%}
+
+/* Live status panel */
+#live-panel{
+  position:fixed;top:90px;left:36px;z-index:10;width:260px;
+  pointer-events:none;
+}
+.lp-agent{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;margin-bottom:4px;
+  background:rgba(20,24,45,0.75);backdrop-filter:blur(12px);
+  border-radius:8px;border:1px solid rgba(255,255,255,0.04);
+  transition:all 0.3s ease;pointer-events:auto;cursor:pointer;
+}
+.lp-agent:hover{background:rgba(30,34,55,0.9);border-color:rgba(255,255,255,0.08)}
+.lp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background 0.5s}
+.lp-dot.running{background:#34d399;box-shadow:0 0 8px #34d39966;animation:pulse-dot 1.5s infinite}
+.lp-dot.completed{background:#60a5fa}
+.lp-dot.error{background:#f87171;box-shadow:0 0 8px #f8717166;animation:pulse-dot 2s infinite}
+.lp-dot.idle{background:#475569}
+.lp-name{font-size:11px;font-weight:600;flex:1;min-width:0}
+.lp-info{font-size:9px;color:#64748b;text-align:right;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* Card */
+#card{
+  position:fixed;bottom:32px;right:32px;width:390px;
+  background:rgba(20,24,45,0.92);backdrop-filter:blur(20px);
+  border:1px solid rgba(167,139,250,0.2);border-radius:14px;
+  padding:24px;z-index:10;
+  opacity:0;transform:translateY(16px);
+  transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+  pointer-events:none;max-height:85vh;overflow-y:auto;
+}
+#card.show{opacity:1;transform:translateY(0);pointer-events:auto}
+#card::-webkit-scrollbar{width:3px}
+#card::-webkit-scrollbar-thumb{background:rgba(167,139,250,0.2);border-radius:3px}
+.c-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:16px;margin-bottom:10px}
+.c-name{font-size:20px;font-weight:700;margin-bottom:3px}
+.c-title{font-size:12px;color:#94a3b8;margin-bottom:14px}
+.c-desc{font-size:12px;line-height:1.7;color:#cbd5e1;margin-bottom:14px}
+.c-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.c-stat{background:rgba(255,255,255,0.03);border-radius:6px;padding:8px 10px}
+.c-stat-label{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1px}
+.c-stat-val{font-size:13px;font-weight:600;margin-top:2px}
+.c-status-badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:1px;padding:2px 8px;border-radius:10px;margin-left:8px}
+
+/* Live section in card */
+.c-live{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)}
+.c-live-title{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.c-live-row{display:flex;gap:10px;margin-bottom:4px;font-size:10px;line-height:1.5}
+.c-live-label{color:#4a5568;min-width:70px;flex-shrink:0}
+.c-live-val{color:#94a3b8;word-break:break-all}
+.c-live-val.ok{color:#34d399}
+.c-live-val.err{color:#f87171}
+.c-live-val.warn{color:#fbbf24}
+
+/* Error log */
+.c-errors{margin-top:10px;padding:8px;background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.15);border-radius:6px}
+.c-errors-title{font-size:9px;color:#f87171;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.c-error-line{font-size:9px;color:#fca5a5;line-height:1.6;font-family:monospace;word-break:break-all}
+
+/* Recent logs */
+.c-logs{margin-top:10px;padding:8px;background:rgba(255,255,255,0.02);border-radius:6px;max-height:120px;overflow-y:auto}
+.c-log-line{font-size:9px;color:#64748b;line-height:1.6;font-family:monospace;word-break:break-all}
+
+#inst{position:fixed;bottom:28px;left:36px;z-index:10;font-size:11px;color:#334155;pointer-events:none}
+#inst span{color:#475569}
+</style>
+</head>
+<body>
+<div id="c"></div>
+
+<div id="hud">
+  <h1>AI AGENT NETWORK</h1>
+  <p><span id="conn-status" style="background:#475569"></span><span id="conn-text">OFFLINE</span> &bull; SDD FRAMEWORK</p>
+</div>
+
+<div id="legend">
+  <div class="leg"><div class="ld" style="background:#34d399"></div>Running</div>
+  <div class="leg"><div class="ld" style="background:#60a5fa"></div>Completed</div>
+  <div class="leg"><div class="ld" style="background:#f87171"></div>Error</div>
+  <div class="leg"><div class="ld" style="background:#475569"></div>Idle</div>
+  <div style="height:12px"></div>
+  <div class="leg"><div class="ld" style="background:#a78bfa"></div>Factory</div>
+  <div class="leg"><div class="ld" style="background:#f472b6"></div>Reporting</div>
+  <div class="leg"><div class="ld" style="background:#60a5fa"></div>Research</div>
+  <div class="leg"><div class="ld" style="background:#34d399"></div>Utility</div>
+</div>
+
+<div id="live-panel"></div>
+
+<div id="card">
+  <div class="c-badge" id="cb"></div>
+  <div class="c-name" id="cn"></div>
+  <div class="c-title" id="ct"></div>
+  <div class="c-desc" id="cd"></div>
+  <div class="c-stats">
+    <div class="c-stat"><div class="c-stat-label">Frequency</div><div class="c-stat-val" id="cf"></div></div>
+    <div class="c-stat"><div class="c-stat-label">Stack</div><div class="c-stat-val" id="cs"></div></div>
+    <div class="c-stat"><div class="c-stat-label">Output</div><div class="c-stat-val" id="co"></div></div>
+    <div class="c-stat"><div class="c-stat-label">AI Model</div><div class="c-stat-val" id="cm"></div></div>
+  </div>
+  <div id="cdet"></div>
+  <div id="clive"></div>
+</div>
+
+<div id="inst">
+  <span>Drag</span> to rotate &bull; <span>Scroll</span> to zoom &bull; <span>Click</span> an agent for details
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+// ─── Agent definitions ───
+// Replace these examples with your own agents. monitorId must match the
+// keys of the AGENTS dict in monitor.py.
+const agents=[
+  {id:'factory',name:'Factory',title:'Chief Architect',role:'AGENT FACTORY',emoji:'\u2699\uFE0F',
+   color:0xa78bfa,hex:'#a78bfa',monitorId:null,
+   desc:'The meta-agent that designs and builds all the others. Follows the SDD framework (GSD + Ralph Loop + BMAD) to turn ideas into complete agents.',
+   freq:'On-demand',stack:'SDD Framework',output:'Complete agents',model:'Claude Opus',
+   details:[['Method','Spec-Driven Development (GSD + Ralph Loop + BMAD)'],['Phases','0: Intake, 1: Spec, 2: Tasks, 3: Execute, 4: Verify, 5: Ship']],
+   radius:1.2,orbitR:0,orbitS:0,orbitO:0},
+
+  {id:'reporter',name:'Reporter',title:'Daily Report Agent',role:'REPORT AGENT',emoji:'\uD83D\uDCE7',
+   color:0xf472b6,hex:'#f472b6',monitorId:'reporter',
+   desc:'Example agent: generates a daily report every morning at 08:00 via launchd.',
+   freq:'Daily 08:00',stack:'Python + Claude API',output:'Markdown report',model:'Claude Sonnet',
+   details:[['Schedule','launchd, daily 08:00'],['Output','data/reports/']],
+   radius:0.75,orbitR:5,orbitS:0.25,orbitO:0},
+
+  {id:'scraper',name:'Scraper',title:'Weekly Research Agent',role:'RESEARCH AGENT',emoji:'\uD83D\uDD0D',
+   color:0x60a5fa,hex:'#60a5fa',monitorId:'scraper',
+   desc:'Example agent: scrapes data sources weekly and produces a research report.',
+   freq:'Weekly Mon 08:00',stack:'OpenCLI + Selenium',output:'Research report',model:'Claude Opus',
+   details:[['Schedule','launchd, Monday 08:00'],['Output','data/output/']],
+   radius:0.75,orbitR:5,orbitS:0.25,orbitO:Math.PI*2/3},
+
+  {id:'ondemand',name:'Helper',title:'On-Demand Agent',role:'UTILITY AGENT',emoji:'\uD83D\uDEE0\uFE0F',
+   color:0x34d399,hex:'#34d399',monitorId:'ondemand',
+   desc:'Example agent: runs on demand, no schedule.',
+   freq:'On-demand',stack:'Python',output:'Files',model:'None',
+   details:[['Schedule','manual'],['Output','data/']],
+   radius:0.75,orbitR:5,orbitS:0.25,orbitO:Math.PI*4/3}
+];
+
+// ─── Live status tracking ───
+const liveStatus={};  // agentId -> {state, lastRun, lastLog, errors, recentLogs, ...}
+let wsConnected=false;
+
+// State colors for 3D
+const STATE_COLORS={
+  running: 0x34d399,
+  completed: 0x60a5fa,
+  error: 0xf87171,
+  idle: null  // use original color
+};
+
+// ─── Scene ───
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x111827);
+scene.fog=new THREE.FogExp2(0x111827,0.028);
+
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,0.1,100);
+camera.position.set(9,7,12);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.2;
+document.getElementById('c').appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=0.05;
+controls.minDistance=5;controls.maxDistance=25;
+controls.maxPolarAngle=Math.PI*0.75;
+controls.target.set(0,0.5,0);
+
+// Lights
+scene.add(new THREE.AmbientLight(0x1e2340,0.7));
+const dir=new THREE.DirectionalLight(0xffffff,0.8);dir.position.set(5,10,5);scene.add(dir);
+const pt1=new THREE.PointLight(0xa78bfa,1.5,20);pt1.position.set(0,5,0);scene.add(pt1);
+const pt2=new THREE.PointLight(0x60a5fa,0.8,15);pt2.position.set(-5,3,-5);scene.add(pt2);
+const pt3=new THREE.PointLight(0x34d399,0.6,15);pt3.position.set(5,3,5);scene.add(pt3);
+
+// Grid
+const g1=new THREE.GridHelper(30,30,0x252b45,0x1a2035);g1.position.y=-2;scene.add(g1);
+
+// Particles
+const pN=800,pArr=new Float32Array(pN*3);
+for(let i=0;i<pN;i++){pArr[i*3]=(Math.random()-0.5)*40;pArr[i*3+1]=(Math.random()-0.5)*20+5;pArr[i*3+2]=(Math.random()-0.5)*40}
+const pGeo=new THREE.BufferGeometry();pGeo.setAttribute('position',new THREE.BufferAttribute(pArr,3));
+const particles=new THREE.Points(pGeo,new THREE.PointsMaterial({color:0x334155,size:0.05,transparent:true,opacity:0.6}));
+scene.add(particles);
+
+// ─── Build agent meshes ───
+const meshes=[],groups=[];
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();
+
+agents.forEach((ag,i)=>{
+  const grp=new THREE.Group();
+
+  const bodyGeo=i===0?new THREE.IcosahedronGeometry(ag.radius,1):new THREE.DodecahedronGeometry(ag.radius,0);
+  const bodyMat=new THREE.MeshPhysicalMaterial({
+    color:ag.color,metalness:0.3,roughness:0.4,clearcoat:0.8,clearcoatRoughness:0.2,
+    emissive:ag.color,emissiveIntensity:0.15,transparent:true,opacity:0.88
+  });
+  const body=new THREE.Mesh(bodyGeo,bodyMat);
+  body.userData={idx:i};
+  grp.add(body);  // [0] body
+  meshes.push(body);
+
+  // Inner ring
+  const r1=new THREE.Mesh(
+    new THREE.RingGeometry(ag.radius+0.12,ag.radius+0.2,32),
+    new THREE.MeshBasicMaterial({color:ag.color,transparent:true,opacity:0.3,side:THREE.DoubleSide})
+  );
+  r1.rotation.x=-Math.PI/2;r1.position.y=-0.1;grp.add(r1);  // [1]
+
+  // Outer ring (status ring — color changes with live state)
+  const r2=new THREE.Mesh(
+    new THREE.RingGeometry(ag.radius+0.3,ag.radius+0.4,32),
+    new THREE.MeshBasicMaterial({color:ag.color,transparent:true,opacity:0.15,side:THREE.DoubleSide})
+  );
+  r2.rotation.x=-Math.PI/2;r2.position.y=-0.1;grp.add(r2);  // [2] status ring
+
+  // Label canvas
+  const lc=document.createElement('canvas');lc.width=512;lc.height=180;
+  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(lc),transparent:true,opacity:0.95}));
+  label.scale.set(3.2,1.1,1);label.position.y=ag.radius+1.2;
+  label.userData={canvas:lc};
+  grp.add(label);  // [3] label
+
+  // Point light
+  const agl=new THREE.PointLight(ag.color,0.4,5);
+  agl.position.set(0,0.5,0);grp.add(agl);  // [4]
+
+  scene.add(grp);groups.push(grp);
+
+  // Draw initial label
+  drawLabel(i);
+});
+
+function drawLabel(i){
+  const ag=agents[i];
+  const label=groups[i].children[3];
+  const lc=label.userData.canvas;
+  const lx=lc.getContext('2d');
+  lx.clearRect(0,0,512,180);
+
+  lx.fillStyle='#ffffff';lx.font='bold 42px Inter,sans-serif';lx.textAlign='center';
+  lx.fillText(ag.name,256,48);
+
+  lx.fillStyle='#94a3b8';lx.font='300 20px Inter,sans-serif';
+  lx.fillText(ag.title,256,80);
+
+  lx.fillStyle=ag.hex;lx.font='600 15px Inter,sans-serif';
+  lx.fillText(ag.role,256,114);
+
+  // Live status line
+  const live=ag.monitorId?liveStatus[ag.monitorId]:null;
+  if(live){
+    const stateColors={running:'#34d399',completed:'#60a5fa',error:'#f87171',idle:'#475569'};
+    const stateLabels={running:'RUNNING',completed:'COMPLETED',error:'ERROR',idle:'IDLE'};
+    lx.fillStyle=stateColors[live.state]||'#475569';
+    lx.font='600 13px Inter,sans-serif';
+    lx.fillText('\u25CF '+stateLabels[live.state],256,144);
+  }else{
+    lx.fillStyle='rgba(255,255,255,0.3)';lx.font='300 13px Inter,sans-serif';
+    lx.fillText(ag.emoji+' '+ag.freq,256,144);
+  }
+
+  label.material.map.needsUpdate=true;
+}
+
+// ─── Connections ───
+const conns=[];
+for(let i=1;i<agents.length;i++){
+  const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]);
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x334155,transparent:true,opacity:0.3}));
+  scene.add(line);conns.push({line,a:0,b:i});
+}
+for(let i=1;i<agents.length;i++){
+  const j=i<agents.length-1?i+1:1;
+  const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]);
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x1e293b,transparent:true,opacity:0.1}));
+  scene.add(line);conns.push({line,a:i,b:j});
+}
+// Data pulses
+const pulses=[];
+for(let i=1;i<agents.length;i++){
+  const m=new THREE.Mesh(new THREE.SphereGeometry(0.05,8,8),new THREE.MeshBasicMaterial({color:agents[i].color,transparent:true,opacity:0.8}));
+  scene.add(m);pulses.push({mesh:m,a:0,b:i,t:Math.random()});
+  const m2=new THREE.Mesh(new THREE.SphereGeometry(0.035,8,8),new THREE.MeshBasicMaterial({color:agents[i].color,transparent:true,opacity:0.5}));
+  scene.add(m2);pulses.push({mesh:m2,a:i,b:0,t:Math.random()});
+}
+
+// ─── Card interaction ───
+let sel=null;
+const cardEl=document.getElementById('card');
+
+function formatTime(iso){
+  if(!iso)return 'n/a';
+  try{
+    const d=new Date(iso);
+    const now=new Date();
+    const diff=Math.floor((now-d)/1000);
+    if(diff<60)return `${diff}s ago`;
+    if(diff<3600)return `${Math.floor(diff/60)}m ago`;
+    if(diff<86400)return `${Math.floor(diff/3600)}h ago`;
+    return d.toLocaleDateString(undefined,{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+  }catch(e){return iso}
+}
+
+function showCard(ag){
+  document.getElementById('cb').textContent=ag.role;
+  document.getElementById('cb').style.cssText=`background:${ag.hex}22;color:${ag.hex};border:1px solid ${ag.hex}44`;
+
+  const live=ag.monitorId?liveStatus[ag.monitorId]:null;
+  let statusHtml='';
+  if(live){
+    const sc={running:['#34d39922','#34d399','#34d39944','RUNNING'],completed:['#60a5fa22','#60a5fa','#60a5fa44','COMPLETED'],error:['#f8717122','#f87171','#f8717144','ERROR'],idle:['#47556922','#475569','#47556944','IDLE']};
+    const s=sc[live.state]||sc.idle;
+    statusHtml=`<span class="c-status-badge" style="background:${s[0]};color:${s[1]};border:1px solid ${s[2]}">${s[3]}</span>`;
+  }
+
+  document.getElementById('cn').innerHTML=ag.emoji+' '+ag.name+statusHtml;
+  document.getElementById('ct').textContent=ag.title;
+  document.getElementById('cd').textContent=ag.desc;
+  document.getElementById('cf').textContent=ag.freq;
+  document.getElementById('cs').textContent=ag.stack;
+  document.getElementById('co').textContent=ag.output;
+  document.getElementById('cm').textContent=ag.model;
+
+  // Static details
+  let detHtml=ag.details.map(d=>
+    `<div class="c-live-row"><span class="c-live-label">${d[0]}</span><span class="c-live-val">${d[1]}</span></div>`
+  ).join('');
+  document.getElementById('cdet').innerHTML='<div class="c-live" style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">'+detHtml+'</div>';
+
+  // Live monitoring section
+  let liveHtml='';
+  if(live){
+    liveHtml+='<div class="c-live"><div class="c-live-title">Live Monitor</div>';
+    liveHtml+=`<div class="c-live-row"><span class="c-live-label">State</span><span class="c-live-val ${live.state==='error'?'err':live.state==='running'?'ok':''}">${live.state.toUpperCase()}</span></div>`;
+    liveHtml+=`<div class="c-live-row"><span class="c-live-label">launchd</span><span class="c-live-val ${live.launchd==='running'?'ok':live.launchd==='not_loaded'?'warn':''}">${live.launchd||'n/a'}</span></div>`;
+    liveHtml+=`<div class="c-live-row"><span class="c-live-label">Last run</span><span class="c-live-val">${formatTime(live.lastRun)}</span></div>`;
+    if(live.outputFile)liveHtml+=`<div class="c-live-row"><span class="c-live-label">Output</span><span class="c-live-val">${live.outputFile}</span></div>`;
+    if(live.lastLog)liveHtml+=`<div class="c-live-row"><span class="c-live-label">Last log</span><span class="c-live-val">${live.lastLog.substring(0,120)}</span></div>`;
+    liveHtml+='</div>';
+
+    // Errors
+    if(live.errors&&live.errors.length>0){
+      liveHtml+='<div class="c-errors"><div class="c-errors-title">Recent errors</div>';
+      live.errors.forEach(e=>liveHtml+=`<div class="c-error-line">${e.substring(0,200)}</div>`);
+      liveHtml+='</div>';
+    }
+
+    // Recent logs
+    if(live.recentLogs&&live.recentLogs.length>0){
+      liveHtml+='<div class="c-logs">';
+      live.recentLogs.forEach(l=>liveHtml+=`<div class="c-log-line">${l.substring(0,200)}</div>`);
+      liveHtml+='</div>';
+    }
+  }else if(!wsConnected){
+    liveHtml='<div class="c-live"><div class="c-live-title">Live Monitor</div><div class="c-live-row"><span class="c-live-val warn">Monitor offline — start it: python3 monitor.py</span></div></div>';
+  }
+  document.getElementById('clive').innerHTML=liveHtml;
+
+  cardEl.classList.add('show');
+}
+
+renderer.domElement.addEventListener('click',e=>{
+  ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(ptr,camera);
+  const h=ray.intersectObjects(meshes);
+  if(h.length){sel=agents[h[0].object.userData.idx];showCard(sel)}
+  else{sel=null;cardEl.classList.remove('show')}
+});
+renderer.domElement.addEventListener('mousemove',e=>{
+  ptr.x=(e.clientX/innerWidth)*2-1;ptr.y=-(e.clientY/innerHeight)*2+1;
+  ray.setFromCamera(ptr,camera);
+  renderer.domElement.style.cursor=ray.intersectObjects(meshes).length?'pointer':'default';
+});
+
+// ─── Live panel (left sidebar) ───
+function updateLivePanel(){
+  const panel=document.getElementById('live-panel');
+  let html='';
+  agents.forEach((ag,i)=>{
+    if(i===0)return; // skip factory
+    const live=ag.monitorId?liveStatus[ag.monitorId]:null;
+    const state=live?live.state:'idle';
+    const info=live?(live.state==='running'?'running...':formatTime(live.lastRun)):ag.freq;
+    html+=`<div class="lp-agent" data-idx="${i}"><div class="lp-dot ${state}"></div><div class="lp-name">${ag.emoji} ${ag.name}</div><div class="lp-info">${info}</div></div>`;
+  });
+  panel.innerHTML=html;
+
+  // Click handlers
+  panel.querySelectorAll('.lp-agent').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const idx=parseInt(el.dataset.idx);
+      sel=agents[idx];showCard(sel);
+    });
+  });
+}
+updateLivePanel();
+
+// ─── Update 3D based on live state ───
+function updateVisuals(){
+  agents.forEach((ag,i)=>{
+    if(i===0||!ag.monitorId)return;
+    const live=liveStatus[ag.monitorId];
+    if(!live)return;
+
+    const body=groups[i].children[0];
+    const statusRing=groups[i].children[2];
+    const stateColor=STATE_COLORS[live.state];
+
+    if(stateColor!==null&&stateColor!==undefined){
+      statusRing.material.color.setHex(stateColor);
+      if(live.state==='running'){
+        statusRing.material.opacity=0.4;
+      }else if(live.state==='error'){
+        statusRing.material.opacity=0.35;
+      }else{
+        statusRing.material.opacity=0.15;
+      }
+    }else{
+      statusRing.material.color.setHex(ag.color);
+      statusRing.material.opacity=0.1;
+    }
+
+    drawLabel(i);
+  });
+
+  updateLivePanel();
+
+  // Refresh card if open
+  if(sel)showCard(sel);
+}
+
+// ─── WebSocket connection ───
+let ws=null;
+let wsRetryTimeout=null;
+
+function connectWS(){
+  // WS runs on port 8765, HTTP dashboard on 8766
+  const wsPort=parseInt(location.port||8766)-1||8765;
+  const url=`ws://${location.hostname||'localhost'}:${wsPort}`;
+  try{ws=new WebSocket(url)}catch(e){return}
+
+  ws.onopen=()=>{
+    wsConnected=true;
+    document.getElementById('conn-status').style.background='#34d399';
+    document.getElementById('conn-text').textContent='LIVE';
+  };
+
+  ws.onclose=()=>{
+    wsConnected=false;
+    document.getElementById('conn-status').style.background='#f87171';
+    document.getElementById('conn-text').textContent='OFFLINE';
+    // Retry in 3s
+    wsRetryTimeout=setTimeout(connectWS,3000);
+  };
+
+  ws.onerror=()=>{ws.close()};
+
+  ws.onmessage=(evt)=>{
+    try{
+      const data=JSON.parse(evt.data);
+      if(data.agents){
+        Object.entries(data.agents).forEach(([id,status])=>{
+          liveStatus[id]=status;
+        });
+        updateVisuals();
+      }
+    }catch(e){console.error('WS parse error',e)}
+  };
+}
+
+// Start connection attempt
+connectWS();
+
+// ─── Animate ───
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+
+  groups.forEach((grp,i)=>{
+    const ag=agents[i];
+    const live=ag.monitorId?liveStatus[ag.monitorId]:null;
+    const isRunning=live&&live.state==='running';
+    const isError=live&&live.state==='error';
+
+    if(i===0){
+      grp.position.set(0,Math.sin(t*0.5)*0.3+1.5,0);
+      grp.children[0].rotation.y=t*0.2;
+      grp.children[0].rotation.x=Math.sin(t*0.3)*0.1;
+    }else{
+      const a=ag.orbitO+t*ag.orbitS;
+      grp.position.set(Math.cos(a)*ag.orbitR,Math.sin(t*0.7+i)*0.2,Math.sin(a)*ag.orbitR);
+      // Faster spin when running
+      const spinSpeed=isRunning?1.2:0.4;
+      grp.children[0].rotation.y=t*spinSpeed;
+      grp.children[0].rotation.x=Math.sin(t*0.5+i*2)*0.15;
+    }
+
+    // Ring pulse — faster/stronger when running
+    grp.children[1].scale.setScalar(1+Math.sin(t*2+i)*0.1);
+    const statusRing=grp.children[2];
+    if(isRunning){
+      statusRing.scale.setScalar(1+Math.sin(t*4+i)*0.2);
+      statusRing.material.opacity=0.25+Math.sin(t*3+i)*0.2;
+    }else if(isError){
+      statusRing.scale.setScalar(1+Math.sin(t*3+i)*0.15);
+      statusRing.material.opacity=0.2+Math.sin(t*2+i)*0.15;
+    }else{
+      statusRing.scale.setScalar(1+Math.sin(t*1.5+i*1.3)*0.15);
+    }
+
+    // Selection glow
+    const body=grp.children[0];
+    const baseGlow=isRunning?0.35:isError?0.25:0.15;
+    body.material.emissiveIntensity=(sel&&sel.id===ag.id)?0.4+Math.sin(t*3)*0.1:baseGlow;
+  });
+
+  // Lines
+  conns.forEach(c=>{
+    const fp=groups[c.a].position,tp=groups[c.b].position;
+    const p=c.line.geometry.attributes.position.array;
+    p[0]=fp.x;p[1]=fp.y;p[2]=fp.z;p[3]=tp.x;p[4]=tp.y;p[5]=tp.z;
+    c.line.geometry.attributes.position.needsUpdate=true;
+  });
+
+  // Pulses — faster when running
+  pulses.forEach(p=>{
+    const agIdx=p.b===0?p.a:p.b;
+    const ag=agents[agIdx];
+    const live=ag&&ag.monitorId?liveStatus[ag.monitorId]:null;
+    const speed=(live&&live.state==='running')?0.012:0.004;
+    p.t+=speed;if(p.t>1)p.t=0;
+    p.mesh.position.lerpVectors(groups[p.a].position,groups[p.b].position,p.t);
+    p.mesh.material.opacity=Math.sin(p.t*Math.PI)*0.8;
+  });
+
+  particles.rotation.y=t*0.01;
+  pt1.intensity=1.2+Math.sin(t*0.8)*0.3;
+
+  controls.update();
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+setTimeout(()=>showCard(agents[0]),1500);
+</script>
+</body>
+</html>

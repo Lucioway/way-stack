@@ -11,7 +11,8 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Master orchestrator** | `~/.claude/CLAUDE.md` — routing tree: classifies every request → picks the right skill/framework |
 | **Vault** | PARA folders (`00_INBOX`, `01_PROJECTS`, `02_KNOWLEDGE`, `03_REFERENCE`, `04_SESSIONS`) + Karpathy LLM Wiki (`index.md` + `log.md`) |
 | **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd` |
-| **Agent factory** | `/agent-spec` → `/agent-tasks` → `/agent-execute` → `/agent-verify` → `/agent-ship` — full SDD flow |
+| **Agent factory** | `/agent-spec` → `/agent-tasks` → `/agent-execute` → `/agent-verify` → `/agent-ship` — full SDD flow + bundled references (full SDD framework w/ Mega Prompt, agent design principles, CLI tools stack) |
+| **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
 | **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
@@ -67,8 +68,9 @@ way-stack/
 ├── commands/              # /stack-bootstrap, /stack-verify, /agent-*
 ├── skills/                # create-agent, vault-{ingest,query,lint}
 ├── hooks/                 # session log + auto-backup
-├── templates/             # orchestrator CLAUDE.md, vault CLAUDE.md, project CLAUDE.md
-├── references/            # SDD framework doc
+├── templates/             # orchestrator CLAUDE.md, vault CLAUDE.md, project CLAUDE.md,
+│   └── agent-monitor/     #   3D live dashboard for the agent fleet (monitor.py + Three.js)
+├── references/            # SDD framework (full, w/ Mega Prompt), agent design principles, CLI tools stack
 ├── README.md
 └── LICENSE                # MIT
 ```

@@ -2,6 +2,18 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.4.0 — 2026-06-10
+
+### Added
+- **Full SDD framework reference** — `references/sdd-framework.md` expanded from condensed 78-line version to the complete framework: why spec-driven beats vibe coding, the 3 source frameworks (GSD + Ralph Loop + BMAD), agent personas, 8 non-negotiable rules, SDD artifacts table, autonomous Ralph mode, and the full **Mega Prompt** (XML system prompt to embed in generated agents' CLAUDE.md).
+- `references/agent-design-principles.md` — required agent architecture, standard command surface (`--dry-run`/`--once`/`--schedule`), 14 design principles, MCP-vs-Skills strategy, automation patterns, 12 common mistakes.
+- `references/tools-setup.md` — recommended CLI stack: OpenCLI full reference (17+ supported sites), companion tools, Claude Code ecosystem tools, alternative AI CLIs.
+- `templates/agent-monitor/` — real-time 3D dashboard for the generated agent fleet: Python WebSocket server (`monitor.py`) scanning launchd/process/log state every 5s + Three.js visualization (`team_visualization.html`). Configurable via `AGENT_WORKSPACE` and `LAUNCHD_PREFIX` env vars.
+- `create-agent` SKILL.md — new "Deep references" section pointing to the 3 bundled references + the agent-monitor template.
+
+### Why
+The agent factory previously shipped only the condensed SDD flow. This release ports the complete knowledge base behind it — full framework, design principles, tooling stack, and fleet monitoring — so generated agents inherit the same depth without external dependencies.
+
 ## v1.3.1 — 2026-06-09
 
 ### Changed
