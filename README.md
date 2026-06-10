@@ -19,7 +19,8 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
-| **Bundled skills** | create-agent, **deploy-project**, vault-ingest, vault-query, vault-lint, **handoff** |
+| **Bundled skills** | create-agent, **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff** |
+| **Design system** | `shinen-design` skill — SHIN-EN 深淵: dark Japanese minimal monochrome for tool dashboards. One stylesheet (`shinen.css`, vanilla CSS, `.sn-*` classes) + signature ghosted step numerals. No frameworks, inlines into stdlib HTTP servers. |
 | **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
 
 ## Install — 3 commands
@@ -60,6 +61,7 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 | "what do we know about rate-limiting Gmail API?" | `vault-query` skill |
 | "save this article on RAG patterns" | `vault-ingest` skill |
 | "deploy this project: /path/to/app" | `deploy-project` skill — 10-step secure deploy to Vercel |
+| "dark dashboard for this tool" | `shinen-design` skill — SHIN-EN monochrome design system |
 | "new project, full web app, auth + payments" | orchestrator asks size → picks framework |
 
 ## Anatomy
@@ -68,7 +70,7 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 way-stack/
 ├── .claude-plugin/plugin.json
 ├── commands/              # /stack-bootstrap, /stack-verify, /agent-*
-├── skills/                # create-agent, deploy-project, vault-{ingest,query,lint}
+├── skills/                # create-agent, deploy-project, shinen-design, vault-{ingest,query,lint}
 ├── hooks/                 # session log + auto-backup
 ├── templates/             # orchestrator CLAUDE.md, vault CLAUDE.md, project CLAUDE.md,
 │   ├── agent-monitor/     #   3D live dashboard for the agent fleet (monitor.py + Three.js)
