@@ -6,3 +6,5 @@ node_modules/
 .vscode/
 .idea/
 *.bak
+__pycache__/
+*.pyc
