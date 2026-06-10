@@ -84,15 +84,16 @@ Run these Claude Code commands (use Bash tool with `claude` CLI, or instruct use
 /plugin install claude-mem@claude-mem
 ```
 
-Then **install caveman via its repo installer** (it ships its own hooks, not the plugin system):
+Then **install caveman via its official one-line installer** (it ships its own hooks/skill, not the plugin system):
 
 ```bash
-git clone --depth 1 https://github.com/JuliusBrussee/claude-code-caveman.git /tmp/caveman-install
-bash /tmp/caveman-install/install.sh
-rm -rf /tmp/caveman-install
+# macOS / Linux / WSL / Git Bash
+curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash
 ```
 
-This drops `caveman-activate.js`, `caveman-mode-tracker.js`, `caveman-config.js`, and `caveman-statusline.sh` into `~/.claude/hooks/` and wires SessionStart + UserPromptSubmit hooks in `settings.json`.
+(Windows PowerShell: `irm https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.ps1 | iex`)
+
+The installer auto-detects every installed agent (Claude Code, Codex, Gemini, …) and wires caveman into each. Needs Node ≥18, ~30s, safe to re-run. Repo: `JuliusBrussee/caveman` (formerly `claude-code-caveman`, renamed 2026-06).
 
 ## STEP 9 — Fetch design skills
 

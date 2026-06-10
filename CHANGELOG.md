@@ -2,6 +2,13 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.4.1 — 2026-06-10
+
+### Fixed
+- **Caveman install broken** — upstream repo `JuliusBrussee/claude-code-caveman` was renamed to `JuliusBrussee/caveman` (404 on the old URL), breaking the `git clone` step in `/stack-bootstrap`. Switched to caveman's official one-line installer: `curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash` (PowerShell variant for Windows). The new installer auto-detects every installed agent and wires caveman into each (Node ≥18, ~30s, re-runnable).
+- `/stack-verify` check #6 relaxed — no longer hard-matches the old `caveman-activate.js` filename; now PASSes on any caveman hook/skill/settings artifact, since the new installer's output names vary by version.
+- README upstream-deps row updated to `JuliusBrussee/caveman`.
+
 ## v1.4.0 — 2026-06-10
 
 ### Added

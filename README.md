@@ -90,7 +90,7 @@ way-stack/
 | ralph-loop | anthropics/claude-plugins-official | Autonomous iteration loop |
 | cli-anything | HKUDS/CLI-Anything | GUI-OSS CLI wrappers |
 | **claude-mem** | thedotmack/claude-mem | Persistent auto-memory across sessions (`$cmem` recap, typed memory files) |
-| caveman (hook-based) | JuliusBrussee/claude-code-caveman | Terse-mode prompt compression — installed via its own `install.sh` |
+| caveman (hook-based) | JuliusBrussee/caveman | Terse-mode prompt compression — installed via its one-line `install.sh` (`curl … | bash`) |
 | **graphify** | safishamsi/graphifyy (pip `graphifyy`) | Knowledge-graph builder + MCP server. `/graphify .` extracts entities/edges from any folder; MCP exposes graph to Claude (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`) |
 | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |

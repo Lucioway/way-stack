@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "way-stack",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Meta-plugin that bootstraps a full Claude Code dev stack: master orchestrator, PARA + Karpathy LLM Wiki vault, SDD agent factory (full framework w/ Mega Prompt), fleet monitor + deploy-project + shinen-design skills, session hooks, and one-command install of 5 upstream plugins + claude-mem (auto-memory) + caveman (terse mode) + graphify (knowledge-graph MCP), 7 design skills, bundled handoff skill, and 3 optional frameworks (GSD 90+ skills, BMAD v6, gstack).",
   "author": {
     "name": "Lucioway",

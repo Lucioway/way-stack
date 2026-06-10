@@ -19,7 +19,7 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`, `claude-mem`.
 
-6. **Caveman installed** (hook-based, not plugin) — `~/.claude/hooks/caveman-activate.js` + `~/.claude/hooks/caveman-mode-tracker.js` exist and are referenced in `~/.claude/settings.json` SessionStart + UserPromptSubmit.
+6. **Caveman installed** (own installer, not plugin) — PASS if ANY of: a `caveman-*.js`/`caveman-*.sh` file exists under `~/.claude/hooks/`, OR a caveman skill dir (`~/.claude/skills/caveman*`), OR a `caveman` reference in `~/.claude/settings.json`. (The `JuliusBrussee/caveman` installer detects each agent and wires itself in — exact artifact names vary by version, so don't hard-match old `caveman-activate.js`.)
 
 7. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `hooked-ux`, `design-sprint`, `ios-hig-design`, `ui-ux-pro-max`. (`frontend-design` is plugin-level, not listed here.)
 
