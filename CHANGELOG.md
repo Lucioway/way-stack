@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.4.2 — 2026-06-10
+
+### Fixed
+- **shinen-design fonts not loading** — the page shell relied on the CSS `@import` for Google Fonts, which is silently dropped when `shinen.css` is inlined or concatenated non-first, falling back to system fonts. Shell now loads the fonts via explicit `<link rel="stylesheet">` (+ `preconnect`) in `<head>`; `@import` kept as a standalone-CSS fallback. Added an offline/self-host note.
+
 ## v1.4.1 — 2026-06-10
 
 ### Fixed

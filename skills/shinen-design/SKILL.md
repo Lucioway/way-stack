@@ -123,6 +123,10 @@ document.querySelectorAll('.sn-step').forEach(el => io.observe(el));
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>{TOOL_NAME}</title>
+  <!-- Fonts: load via <link> (more reliable than CSS @import, esp. when inlined). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@700&display=swap">
   <link rel="stylesheet" href="shinen.css">
 </head>
 <body>
@@ -164,7 +168,7 @@ Per-tool differentiator = the step *count* and *content*, never the visual langu
 ## 8. Adoption Checklist
 
 1. Copy `shinen.css` next to your HTML (or inline it in a `<style>` tag for single-file servers)
-2. Use the page shell from §5; fill `{BRAND}` / `{TOOL_NAME}`
+2. Use the page shell from §5; fill `{BRAND}` / `{TOOL_NAME}`. **Keep the font `<link>` tags in `<head>`** — the CSS `@import` is only a fallback and gets dropped when the CSS is inlined or concatenated non-first, so without the `<link>` the page silently falls back to system fonts. Needs network access (Google Fonts CDN); for offline/air-gapped, self-host the 3 woff2 files and swap the URL.
 3. Wrap each pipeline phase in a `.sn-step` with zero-padded `data-step`
 4. Paste the IntersectionObserver helper in a `<script>`
 5. Run through §6 rules before shipping
