@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.5.0 — 2026-06-23
+
+### Added
+- **`scrapling-official` skill** — vendored the official Scrapling agent skill (D4Vinci, BSD-3) into `skills/scrapling-official/`. Adaptive web scraping with anti-bot bypass (Cloudflare Turnstile), stealth headless browsing, spiders framework, adaptive element relocation, and JS rendering. Use when `web_fetch` fails or a site has anti-bot protection. Requires `pip install "scrapling[all]>=0.4.9" && scrapling install --force` (Python 3.10+). Includes SKILL.md, references/ (parsing, fetching, spiders, mcp-server), and runnable examples/.
+
 ## v1.4.2 — 2026-06-10
 
 ### Fixed
