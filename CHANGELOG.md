@@ -2,6 +2,12 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.6.0 — 2026-06-24
+
+### Added
+- **Orchestrator: loop-first default mode** — `templates/orchestrator-CLAUDE.md` now declares a `DEFAULT OPERATING MODE — loop-first`: non-trivial/repeat/long tasks run as an agentic loop (read state → prompt from anchor files → run → verify with an automated check → stop on pass/no-progress/budget → context-reset per iteration) with 3 hard stops, instead of one-shot prompting. Framed as Karpathy's `autoresearch` pattern. New agents must be loop-driven, not one-shot wrappers.
+- **Orchestrator: Software 3.0 mindset** — added Karpathy's framing up top: you program the LLM via context/tools/memory/examples; the context window *is* the program; the operator is an orchestrator of agents, not a code typist.
+
 ## v1.5.0 — 2026-06-23
 
 ### Added
