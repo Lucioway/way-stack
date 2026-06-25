@@ -173,6 +173,8 @@ touch ~/.claude/projects/.gitkeep
 
 Per-project `memory/MEMORY.md` index files are auto-created by `claude-mem` on first session start. Nothing else to do here.
 
+> **Convention — keep `MEMORY.md` lean.** It loads into every prompt, so it is pure context cost. Hold only identity + cross-project rules + one-line pointers; offload per-brand/per-project detail into `index_<topic>.md` sub-index files that get lazy-loaded only when that topic is in play. Re-fold the index whenever a section grows past ~15 entries.
+
 ## STEP 13 — Install Graphify (knowledge-graph MCP)
 
 `graphify` (safishamsi/graphifyy) builds a knowledge graph from any folder of `.md`/`.json`/code files and exposes it to Claude via MCP. It replaces hand-curated wikilinks: instead of you maintaining `[[links]]`, Graphify infers the graph structurally — cross-entity traversal, shortest path, god-nodes detection — and Claude queries it natively.

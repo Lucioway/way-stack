@@ -21,7 +21,7 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 - **code-review** — parallel multi-agent review (`/code-review:code-review`)
 - **cli-anything** — CLI wrappers for GUI OSS (GIMP, Blender, LibreOffice…)
 - **ralph-loop** — autonomous iteration loop, clean context per iter
-- **claude-mem** (`thedotmack/claude-mem`) — persistent auto-memory across sessions; injects `$cmem` recap at session start; per-project memory dir at `~/.claude/projects/<proj>/memory/MEMORY.md` (typed memories: user / feedback / project / reference)
+- **claude-mem** (`thedotmack/claude-mem`) — persistent auto-memory across sessions; injects `$cmem` recap at session start; per-project memory dir at `~/.claude/projects/<proj>/memory/MEMORY.md` (typed memories: user / feedback / project / reference). **Keep `MEMORY.md` a LEAN sub-index** (loaded into every prompt = pure context cost): hold only identity + cross-project rules + one-line pointers; offload per-brand/per-project detail to `index_<topic>.md` files and lazy-load them only when that topic is in play. The context window is the program — don't pollute every prompt with detail 90% of tasks never use.
 - **caveman** (hook-based, not plugin) — terse output mode; toggle `/caveman lite|full|ultra`, off via "stop caveman" / "normal mode"
 
 ### Design skills (auto by keyword)

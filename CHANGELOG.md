@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.7.0 — 2026-06-25
+
+### Added
+- **Lean `MEMORY.md` sub-index convention** — orchestrator template + `stack-bootstrap` STEP 12 now codify keeping `MEMORY.md` as a lean top-level index (identity + cross-project rules + one-line pointers only), offloading per-brand/per-project detail into `index_<topic>.md` files that lazy-load only when that topic is in play. `MEMORY.md` loads into every prompt, so detail 90% of tasks never use is pure context cost. Re-fold a section once it grows past ~15 entries. Grounded in the "context window is the program" principle (Karpathy Software 3.0) + research that bloated always-on context files raise inference cost and lower task success.
+
 ## v1.6.0 — 2026-06-24
 
 ### Added
