@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.8.0 — 2026-06-26
+
+### Added
+- **`skillspector` skill** — wraps [NVIDIA SkillSpector](https://github.com/NVIDIA/SkillSpector), a security scanner for AI agent skills (68 vulnerability patterns across 17 categories: prompt injection, data exfiltration, privilege escalation, supply chain, MCP tool poisoning, etc.). Two-stage static + optional LLM analysis, OSV.dev CVE lookups, SARIF/JSON/Markdown reports with a 0–100 risk score. Use before installing an untrusted third-party skill/plugin/MCP, or before publishing one. Thin wrapper over the standalone `skillspector` CLI (`uv tool install git+https://github.com/NVIDIA/skillspector.git`) — the Apache-2.0 tool is not vendored.
+
 ## v1.7.0 — 2026-06-25
 
 ### Added
