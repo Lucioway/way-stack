@@ -23,6 +23,8 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 - **ralph-loop** — autonomous iteration loop, clean context per iter
 - **claude-mem** (`thedotmack/claude-mem`) — persistent auto-memory across sessions; injects `$cmem` recap at session start; per-project memory dir at `~/.claude/projects/<proj>/memory/MEMORY.md` (typed memories: user / feedback / project / reference). **Keep `MEMORY.md` a LEAN sub-index** (loaded into every prompt = pure context cost): hold only identity + cross-project rules + one-line pointers; offload per-brand/per-project detail to `index_<topic>.md` files and lazy-load them only when that topic is in play. The context window is the program — don't pollute every prompt with detail 90% of tasks never use.
 - **caveman** (hook-based, not plugin) — terse output mode; toggle `/caveman lite|full|ultra`, off via "stop caveman" / "normal mode"
+- **ponytail** (`DietrichGebert/ponytail`) — lazy-senior-dev mode: simplest solution that works, YAGNI, stdlib first, shortest diff wins; toggle `/ponytail lite|full|ultra`, off via "stop ponytail". Pairs with caveman (ponytail = what you build, caveman = how you talk).
+- **impeccable** (`pbakaus/impeccable`) — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + curated anti-pattern detection. Composes with `frontend-design`.
 
 ### Design skills (auto by keyword)
 | Skill | Triggers |
@@ -145,6 +147,8 @@ New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt 
 | ship | `/agent-ship` or framework equivalent |
 | stopping mid-task, fresh chat tomorrow | `/handoff` (writes `HANDOFF.md`) |
 | terse mode / less filler | `/caveman full` (off: "stop caveman") |
+| keep it simple / no over-engineering | `/ponytail full` (off: "stop ponytail") |
+| polish / audit existing frontend | `/impeccable polish` / `/impeccable audit` |
 | what does the system remember about me | check `$cmem` recap at session start OR read `~/.claude/projects/<proj>/memory/MEMORY.md` |
 
 ## ANNOUNCEMENT PROTOCOL
@@ -158,6 +162,10 @@ Examples:
 > **Routing:** direct — no framework — XS trivial fix
 
 Then execute. User override respected.
+
+## EDIT DISCIPLINE (token efficiency)
+
+Read a file before editing it. Grep all callers before changing a function. Point at code with exact location `<file> lines <a>-<b>, <fn>`. Don't re-read the same file twice per session.
 
 ## BEFORE ANY RESPONSE — CHECKLIST
 

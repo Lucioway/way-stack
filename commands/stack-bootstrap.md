@@ -1,6 +1,6 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds 3 upstream marketplaces, installs 5 plugins + claude-mem (auto-memory) + caveman (terse mode), fetches 7 design skills, installs 3 frameworks (GSD, BMAD, gstack), bundles the handoff skill. Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds 3 upstream marketplaces, installs 5 plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency), fetches 7 design skills, installs 3 frameworks (GSD, BMAD, gstack), bundles the handoff skill. Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
@@ -83,6 +83,18 @@ Run these Claude Code commands (use Bash tool with `claude` CLI, or instruct use
 /plugin install cli-anything@cli-anything
 /plugin install claude-mem@claude-mem
 ```
+
+Then add the two style/quality add-on marketplaces and install their plugins:
+
+```
+/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail
+/plugin marketplace add pbakaus/impeccable
+/plugin install impeccable@impeccable
+```
+
+- **ponytail** — lazy-senior-dev mode: forces the simplest solution that works (YAGNI, stdlib first). Toggle `/ponytail lite|full|ultra`, off via "stop ponytail".
+- **impeccable** — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + anti-pattern detection. Composes with `frontend-design`.
 
 Then **install caveman via its official one-line installer** (it ships its own hooks/skill, not the plugin system):
 
@@ -232,7 +244,7 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ Vault created at <path>
 ✓ Orchestrator installed
 ✓ Hooks registered (vault + caveman + claude-mem)
-✓ 6 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem)
+✓ 8 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable)
 ✓ Caveman hooks installed
 ✓ 7 design skills fetched
 ✓ handoff skill bundled

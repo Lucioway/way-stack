@@ -2,6 +2,13 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v1.9.0 — 2026-07-10
+
+### Added
+- **`ponytail` plugin** (DietrichGebert/ponytail) — lazy-senior-dev mode: forces the simplest solution that works (YAGNI, stdlib/native-platform first, shortest working diff, no unrequested abstractions). Toggle `/ponytail lite|full|ultra`, off via "stop ponytail". Pairs with caveman: ponytail governs what you build, caveman how you talk. Installed by `stack-bootstrap` STEP 8; documented in orchestrator template inventory + cheatsheet.
+- **`impeccable` plugin** (pbakaus/impeccable) — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + curated anti-pattern detection. Composes with `frontend-design`. Installed by `stack-bootstrap` STEP 8; documented in orchestrator template inventory + cheatsheet.
+- **Orchestrator: EDIT DISCIPLINE section** — token-efficiency rules ported from the live stack: read before edit, grep all callers before changing a function, point at code with exact `<file> lines <a>-<b>, <fn>`, never re-read the same file twice per session.
+
 ## v1.8.0 — 2026-06-26
 
 ### Added

@@ -15,7 +15,7 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
-| **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory) |
+| **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory), **ponytail** (lazy-dev mode), **impeccable** (design fluency) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
@@ -91,6 +91,8 @@ way-stack/
 | cli-anything | HKUDS/CLI-Anything | GUI-OSS CLI wrappers |
 | **claude-mem** | thedotmack/claude-mem | Persistent auto-memory across sessions (`$cmem` recap, typed memory files) |
 | caveman (hook-based) | JuliusBrussee/caveman | Terse-mode prompt compression — installed via its one-line `install.sh` (`curl … | bash`) |
+| **ponytail** | DietrichGebert/ponytail | Lazy-senior-dev mode — simplest solution that works (YAGNI, stdlib first, shortest diff). `/ponytail lite\|full\|ultra` |
+| **impeccable** | pbakaus/impeccable | Frontend design fluency — 1 skill, 23 commands (`/impeccable polish\|audit\|critique\|…`), anti-pattern detection |
 | **graphify** | safishamsi/graphifyy (pip `graphifyy`) | Knowledge-graph builder + MCP server. `/graphify .` extracts entities/edges from any folder; MCP exposes graph to Claude (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`) |
 | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |
