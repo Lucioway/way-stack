@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.1.1 — 2026-08-31
+
+### Added
+- **Wayfinder as default planning layer** — bootstrap STEP 8 documents the `/setup-matt-pocock-skills` one-time setup; orchestrator routes work bigger than one session to `wayfinder` (decision-ticket map, 1 ticket = 1 decision = 1 session) instead of GSD, with a migration prompt for projects that already have `.planning/`.
+
 ## v2.1.0 — 2026-08-31
 
 ### Added

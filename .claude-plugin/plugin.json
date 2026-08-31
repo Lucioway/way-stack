@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "way-stack",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Meta-plugin that bootstraps a full Claude Code dev stack: master orchestrator (with model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, SDD agent factory, workflow skills (handoff, reboot, dream memory consolidation, session-audit, context-budget, council, claudex-loop plan hardening), plus one-command install of 10 upstream plugins (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable, watch, mattpocock-skills), 8 design skills (incl. hallmark), graphify knowledge-graph MCP, and 3 optional frameworks (GSD, BMAD v6, gstack).",
   "author": {
     "name": "Lucioway",
@@ -45,6 +45,7 @@
     "qa-test",
     "agent-browser",
     "agent-reach",
-    "loop-design-check"
+    "loop-design-check",
+    "wayfinder"
   ]
 }

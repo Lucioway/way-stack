@@ -115,7 +115,13 @@ Then two more quality-of-life plugins:
 ```
 
 - **watch** — `/watch <video URL or path>`: downloads with yt-dlp, extracts frames + transcript, lets Claude answer questions about any video.
-- **mattpocock-skills** — process skills: diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, code-review, wizard (interactive bash walkthroughs for human-only steps), grilling (stress-test a plan).
+- **mattpocock-skills** — process skills: **wayfinder** (multi-session planning as decision tickets — the default planning layer), diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, code-review, wizard (interactive bash walkthroughs for human-only steps), grilling (stress-test a plan).
+
+After installing mattpocock-skills, run its one-time setup (configures the wayfinder tracker — github / gitlab / local markdown):
+
+```
+/setup-matt-pocock-skills
+```
 
 Then **install caveman via its official one-line installer** (it ships its own hooks/skill, not the plugin system):
 

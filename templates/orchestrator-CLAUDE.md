@@ -77,6 +77,7 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 
 1. **IDEATE** → `superpowers:brainstorming` or `/office-hours` (gstack)
 2. **NEW PROJECT (structured)** → `/agent-spec` (way-stack SDD) or BMAD / GSD if installed
+   - **Work bigger than one session** → `wayfinder` (mattpocock-skills) is the DEFAULT planning layer: map of decision tickets, 1 ticket = 1 decision = 1 session, decisions persist on the map. Planning only, not execution. Composes with grilling / domain-modeling / research / prototype. Projects with an existing `.planning/` (GSD) → ask whether to migrate or finish in GSD.
 3. **ADD FEATURE** → `/gsd-new-milestone` or `/bmad:create-story` (framework-dependent)
 4. **BUG / DEBUG** → `superpowers:systematic-debugging`
 5. **UI / FRONTEND** → see Frontend Routing Table below
@@ -201,6 +202,7 @@ New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt 
 | parse this text/log/export | `regex-vs-llm-structured-text` |
 | about to launch a loop | `loop-design-check` |
 | audit my skills | `skill-stocktake` → `rules-distill` |
+| plan work bigger than one session | `wayfinder` (after `/setup-matt-pocock-skills`) |
 | keep it simple / no over-engineering | `/ponytail full` (off: "stop ponytail") |
 | polish / audit existing frontend | `/impeccable polish` / `/impeccable audit` |
 | what does the system remember about me | check `$cmem` recap at session start OR read `~/.claude/projects/<proj>/memory/MEMORY.md` |
