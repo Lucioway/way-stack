@@ -155,6 +155,20 @@ if [ ! -d hallmark ]; then
 fi
 ```
 
+Then three third-party power skills (fetched, not vendored):
+
+```bash
+# qa-test — automated front-end QA (standard + crawl + adversarial break-it modes)
+[ ! -d qa-test ] && git clone --depth 1 https://github.com/adampaulwalker/qa-test.git qa-test && rm -rf qa-test/.git
+
+# agent-browser — browser automation CLI for agents (Vercel Labs)
+[ ! -d agent-browser ] && npx -y agent-browser@latest install 2>/dev/null || echo "agent-browser: install manually — https://github.com/vercel-labs/agent-browser"
+
+# agent-reach — multi-platform internet research (15 channels: Reddit, X, YouTube, LinkedIn, …)
+[ ! -d agent-reach ] && git clone --depth 1 https://github.com/Panniantong/Agent-Reach.git .tmp-reach && \
+  { mv .tmp-reach/skills/agent-reach ./agent-reach 2>/dev/null || mv .tmp-reach ./agent-reach; rm -rf .tmp-reach; }
+```
+
 If `git clone` fails (repo moved / renamed), log warning and continue — don't halt.
 
 ## STEP 10 — Bundled workflow skills
@@ -176,6 +190,15 @@ These further workflow skills ship inside the way-stack plugin itself (nothing t
 - **claudex-loop** — four-phase plan hardening with adversarial OpenAI Codex review (requires `codex` CLI; skip if not installed)
 
 Plus command `/caveman-commit` (terse conventional commits).
+
+And six engineering-craft skills, also bundled in the plugin:
+
+- **agent-harness-construction** — design agent action spaces, tool definitions, observation formatting
+- **click-path-audit** — trace every UI touchpoint through its full state-change sequence (finds bugs unit tests miss)
+- **regex-vs-llm-structured-text** — decision framework: regex first, LLM only for low-confidence edge cases
+- **loop-design-check** — verify an agentic loop has automated verification + the 3 hard stops before launch
+- **skill-stocktake** — audit your skills/commands for quality (Quick Scan + Full modes)
+- **rules-distill** — extract cross-cutting principles from skills into rule files
 
 ## STEP 11 — Install frameworks (optional, ask once per framework)
 
@@ -286,7 +309,8 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ 10 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable, watch, mattpocock-skills)
 ✓ Caveman hooks installed
 ✓ 8 design skills fetched (incl. hallmark)
-✓ 7 workflow skills bundled (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop)
+✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
+✓ 13 skills bundled (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
 ✓ Frameworks: GSD ✓ BMAD ✓ gstack ✓
 ✓ Graphify CLI + skill + MCP server registered
 ⚠ 1 skill failed (nextlevelbuilder moved) — install manually

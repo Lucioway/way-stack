@@ -35,6 +35,16 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 - **context-budget** — audit context-window cost of agents/skills/MCP/rules; prioritized savings. The context window is the program — keep it lean.
 - **council** — four-voice structured disagreement for ambiguous decisions and go/no-go calls.
 - **claudex-loop** — plan hardening: recon → interrogate → adversarial Codex review loop → optional cross-model build. For high-stakes work (auth, schema, migrations, payments, greenfield architecture). Requires `codex` CLI.
+- **agent-harness-construction** — designing agent action spaces / tool definitions / observation formats.
+- **click-path-audit** — after refactors touching shared state, or "buttons broken but tests pass": trace every touchpoint through its full state-change sequence.
+- **regex-vs-llm-structured-text** — parsing structured text: regex first, LLM only for low-confidence edge cases.
+- **loop-design-check** — before launching any agentic loop: automated verify + 3 hard stops present?
+- **skill-stocktake** / **rules-distill** — periodic skill-quality audit; distill cross-cutting principles into rules.
+
+### Fetched power skills
+- **qa-test** — automated front-end QA: criteria testing, site crawl, adversarial break-it mode.
+- **agent-browser** — browser automation CLI (navigate, fill, click, screenshot, scrape, test).
+- **agent-reach** — multi-platform internet research (Reddit, X, YouTube, LinkedIn, HN, …).
 
 ### Design skills (auto by keyword)
 | Skill | Triggers |
@@ -184,6 +194,13 @@ New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt 
 | what skills am I missing | `session-audit` |
 | sessions feel heavy / slow | `context-budget` |
 | restart with clean context | `/reboot` (handoff + auto-resume) |
+| QA this app / try to break it | `qa-test` |
+| research X across the internet | `agent-reach` |
+| automate a website / fill forms | `agent-browser` |
+| buttons broken but tests pass | `click-path-audit` |
+| parse this text/log/export | `regex-vs-llm-structured-text` |
+| about to launch a loop | `loop-design-check` |
+| audit my skills | `skill-stocktake` → `rules-distill` |
 | keep it simple / no over-engineering | `/ponytail full` (off: "stop ponytail") |
 | polish / audit existing frontend | `/impeccable polish` / `/impeccable audit` |
 | what does the system remember about me | check `$cmem` recap at session start OR read `~/.claude/projects/<proj>/memory/MEMORY.md` |

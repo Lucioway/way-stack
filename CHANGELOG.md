@@ -2,6 +2,13 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.1.0 — 2026-08-31
+
+### Added
+- **6 more bundled engineering-craft skills**: `agent-harness-construction` (agent action-space/tool design), `click-path-audit` (UI state-sequence tracing), `regex-vs-llm-structured-text` (parsing decision framework), `loop-design-check` (pre-launch loop verification), `skill-stocktake` (skill-quality audit), `rules-distill` (principles → rule files).
+- **3 fetched power skills** in bootstrap STEP 9: `qa-test` (adampaulwalker — adversarial front-end QA), `agent-browser` (Vercel Labs — browser automation CLI), `agent-reach` (Panniantong/Agent-Reach — 15-channel internet research).
+- Orchestrator inventory + cheatsheet rows for all nine.
+
 ## v2.0.0 — 2026-08-31
 
 Definitive edition — full sync with the live stack after 7 weeks of upgrades.
