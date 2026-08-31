@@ -1,6 +1,6 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds 3 upstream marketplaces, installs 5 plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency), fetches 7 design skills, installs 3 frameworks (GSD, BMAD, gstack), bundles the handoff skill. Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches design skills (incl. hallmark), installs 3 frameworks (GSD, BMAD, gstack), bundles 8 workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, …). Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
@@ -54,9 +54,18 @@ Read `~/.claude/settings.json` (create empty `{}` if absent). Merge in:
     "SessionEnd": [
       { "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/vault-session-log.sh" }] },
       { "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/vault-auto-backup.sh" }] }
+    ],
+    "SessionStart": [
+      { "matcher": "clear", "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/reboot-resume.sh" }] }
     ]
   }
 }
+```
+
+Also copy the reboot hook (used by the bundled `reboot` skill):
+
+```bash
+cp "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/ && chmod +x ~/.claude/hooks/reboot-resume.sh
 ```
 
 Preserve existing hooks — append, don't replace. Use `jq` if available.
@@ -96,6 +105,18 @@ Then add the two style/quality add-on marketplaces and install their plugins:
 - **ponytail** — lazy-senior-dev mode: forces the simplest solution that works (YAGNI, stdlib first). Toggle `/ponytail lite|full|ultra`, off via "stop ponytail".
 - **impeccable** — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + anti-pattern detection. Composes with `frontend-design`.
 
+Then two more quality-of-life plugins:
+
+```
+/plugin marketplace add bradautomates/claude-video
+/plugin install watch@claude-video
+/plugin marketplace add mattpocock/skills
+/plugin install mattpocock-skills@mattpocock
+```
+
+- **watch** — `/watch <video URL or path>`: downloads with yt-dlp, extracts frames + transcript, lets Claude answer questions about any video.
+- **mattpocock-skills** — process skills: diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, code-review, wizard (interactive bash walkthroughs for human-only steps), grilling (stress-test a plan).
+
 Then **install caveman via its official one-line installer** (it ships its own hooks/skill, not the plugin system):
 
 ```bash
@@ -125,11 +146,18 @@ done
 # ui-ux-pro-max
 [ ! -d ui-ux-pro-max ] && git clone --depth 1 \
   https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git ui-ux-pro-max
+
+# hallmark — anti-AI-slop structural variety for landing/app pages (nutlope)
+# skill lives in the repo's skills/ subdir — clone temp, move skill out
+if [ ! -d hallmark ]; then
+  git clone --depth 1 https://github.com/nutlope/hallmark.git .tmp-hallmark && \
+  mv .tmp-hallmark/skills/hallmark ./hallmark && rm -rf .tmp-hallmark
+fi
 ```
 
 If `git clone` fails (repo moved / renamed), log warning and continue — don't halt.
 
-## STEP 10 — Install handoff skill (bundled)
+## STEP 10 — Bundled workflow skills
 
 The `handoff` skill writes `HANDOFF.md` so a fresh-context agent can resume work. Bundled with way-stack (no remote fetch):
 
@@ -137,6 +165,17 @@ The `handoff` skill writes `HANDOFF.md` so a fresh-context agent can resume work
 mkdir -p ~/.claude/skills/handoff
 cp "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md
 ```
+
+These further workflow skills ship inside the way-stack plugin itself (nothing to copy — active as soon as the plugin is installed):
+
+- **reboot** — handoff → `/clear` → auto-resume via the `reboot-resume.sh` SessionStart hook (STEP 6)
+- **dream** — memory consolidation: merge duplicates, resolve contradictions, absolute dates, keep `MEMORY.md` under the ~24.4KB load limit
+- **session-audit** — monthly diagnosis of repeated manual tasks → propose new skills/automations
+- **context-budget** — audit context-window cost of agents/skills/MCP/rules, prioritized savings
+- **council** — four-voice structured disagreement for ambiguous decisions / go-no-go calls
+- **claudex-loop** — four-phase plan hardening with adversarial OpenAI Codex review (requires `codex` CLI; skip if not installed)
+
+Plus command `/caveman-commit` (terse conventional commits).
 
 ## STEP 11 — Install frameworks (optional, ask once per framework)
 
@@ -243,11 +282,11 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ```
 ✓ Vault created at <path>
 ✓ Orchestrator installed
-✓ Hooks registered (vault + caveman + claude-mem)
-✓ 8 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable)
+✓ Hooks registered (vault + reboot + caveman + claude-mem)
+✓ 10 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable, watch, mattpocock-skills)
 ✓ Caveman hooks installed
-✓ 7 design skills fetched
-✓ handoff skill bundled
+✓ 8 design skills fetched (incl. hallmark)
+✓ 7 workflow skills bundled (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop)
 ✓ Frameworks: GSD ✓ BMAD ✓ gstack ✓
 ✓ Graphify CLI + skill + MCP server registered
 ⚠ 1 skill failed (nextlevelbuilder moved) — install manually

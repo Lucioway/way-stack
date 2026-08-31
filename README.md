@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator, PARA + Karpathy LLM Wiki vault, Spec-Driven Development (SDD) agent factory, session-persistence hooks, 6 upstream plugins, 7 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, Spec-Driven Development (SDD) agent factory, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 8 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
@@ -15,11 +15,13 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
-| **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory), **ponytail** (lazy-dev mode), **impeccable** (design fluency) |
+| **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **claude-mem** (auto-memory), **ponytail** (lazy-dev mode), **impeccable** (design fluency), **watch** (video Q&A), **mattpocock-skills** (process skills) |
+| **Workflow skills (bundled)** | **handoff** (HANDOFF.md), **reboot** (handoff → /clear → auto-resume), **dream** (memory consolidation), **session-audit** (find missing skills monthly), **context-budget** (context-cost audit), **council** (4-voice decision panel), **claudex-loop** (plan hardening w/ adversarial Codex review) |
+| **Model routing** | Orchestrator suggests the right model tier per task (`/model`), the `/effort` lever before downgrading, and the advisor pattern (mid model executes, top model advises) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
-| **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max |
-| **Bundled skills** | create-agent, **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff** |
+| **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max, **hallmark** |
+| **Bundled skills** | create-agent, **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, council, claudex-loop |
 | **Design system** | `shinen-design` skill — SHIN-EN 深淵: dark Japanese minimal monochrome for tool dashboards. One stylesheet (`shinen.css`, vanilla CSS, `.sn-*` classes) + signature ghosted step numerals. No frameworks, inlines into stdlib HTTP servers. |
 | **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
 
@@ -96,6 +98,9 @@ way-stack/
 | **graphify** | safishamsi/graphifyy (pip `graphifyy`) | Knowledge-graph builder + MCP server. `/graphify .` extracts entities/edges from any folder; MCP exposes graph to Claude (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`) |
 | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |
+| **hallmark** | nutlope/hallmark | Anti-AI-slop structural variety for landing/app pages (audit/redesign/study verbs) |
+| **watch** | claude-video marketplace | `/watch <video>` — frames + transcript + Q&A on any video |
+| **mattpocock-skills** | mattpocock marketplace | Process skills: tdd, diagnosing-bugs, prototype, wizard, grilling, … |
 | **GSD** (optional) | gsd-build/get-shit-done (`npx get-shit-done-cc --claude --global`) | Spec-driven dev framework, ~70 skills |
 | **BMAD v6** (optional) | bmad-code-org/BMAD-METHOD (`npx bmad-method install`) | Agile multi-role methodology, 9 skills |
 | **gstack** (optional) | garrytan/gstack (git clone + `./setup`) | Garry Tan's virtual team, ~38 skills + browser |

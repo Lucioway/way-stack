@@ -2,6 +2,29 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.0.0 — 2026-08-31
+
+Definitive edition — full sync with the live stack after 7 weeks of upgrades.
+
+### Added
+- **7 bundled workflow skills** (ship inside the plugin, active on install):
+  - `reboot` — handoff → `/clear` → auto-resume via new `hooks/reboot-resume.sh` SessionStart hook (registered in bootstrap STEP 6)
+  - `dream` — memory consolidation: merge duplicate memory files, resolve contradictions, absolute dates, keep `MEMORY.md` under its ~24.4KB load limit
+  - `session-audit` — monthly diagnosis of repeated manual tasks → propose new skills/automations
+  - `context-budget` — context-window cost audit across agents/skills/MCP/rules
+  - `council` — four-voice structured disagreement for ambiguous decisions / go-no-go calls
+  - `claudex-loop` — four-phase plan hardening with adversarial OpenAI Codex review (requires `codex` CLI)
+  - `/caveman-commit` command — terse conventional commits
+- **2 new upstream plugins** in bootstrap STEP 8: `watch` (claude-video — video frames + transcript + Q&A) and `mattpocock-skills` (tdd, diagnosing-bugs, prototype, wizard, grilling, …)
+- **`hallmark` design skill** (nutlope/hallmark) fetched in STEP 9 — anti-AI-slop structural variety for landing/app pages
+- **Orchestrator: MODEL ROUTING section** — tier the model to the task (top/mid/small), one-line suggestion protocol via `/model`, never assume the switch happened, re-tier at phase boundaries; subagents get the `model` param applied directly. Includes the **effort lever** (`/effort medium|low` before any downgrade) and the **advisor pattern** (`/model <mid>` + `/advisor <top>`).
+- **Orchestrator: CONTEXT HYGIENE — reference offload** — always-on files stay operational-only; enumerated inventories live in on-demand reference files; audit with `context-budget`.
+- Orchestrator inventory + cheatsheet rows for all of the above.
+
+### Changed
+- Bootstrap verify list: 10 plugins, 8 design skills, 7 bundled workflow skills.
+- README rewritten to match.
+
 ## v1.9.0 — 2026-07-10
 
 ### Added

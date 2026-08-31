@@ -25,6 +25,16 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 - **caveman** (hook-based, not plugin) — terse output mode; toggle `/caveman lite|full|ultra`, off via "stop caveman" / "normal mode"
 - **ponytail** (`DietrichGebert/ponytail`) — lazy-senior-dev mode: simplest solution that works, YAGNI, stdlib first, shortest diff wins; toggle `/ponytail lite|full|ultra`, off via "stop ponytail". Pairs with caveman (ponytail = what you build, caveman = how you talk).
 - **impeccable** (`pbakaus/impeccable`) — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + curated anti-pattern detection. Composes with `frontend-design`.
+- **watch** (`claude-video`) — `/watch <video>`: frames + transcript from any video URL/path, then Q&A about it. Video analysis = always `/watch`, never guess.
+- **mattpocock-skills** — process skills: diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, wizard (guided bash for human-only steps), grilling (stress-test a plan).
+
+### Bundled workflow skills (way-stack)
+- **handoff** / **reboot** — `HANDOFF.md` for fresh-context resume; `/reboot` = handoff → `/clear` → auto-resume (SessionStart hook).
+- **dream** — memory consolidation: merge duplicate memory files, resolve contradictions, absolute dates, keep `MEMORY.md` under its ~24.4KB load limit. Run monthly or when memory bloats.
+- **session-audit** — monthly: cluster repeated manual tasks across recent sessions → propose skills/automations.
+- **context-budget** — audit context-window cost of agents/skills/MCP/rules; prioritized savings. The context window is the program — keep it lean.
+- **council** — four-voice structured disagreement for ambiguous decisions and go/no-go calls.
+- **claudex-loop** — plan hardening: recon → interrogate → adversarial Codex review loop → optional cross-model build. For high-stakes work (auth, schema, migrations, payments, greenfield architecture). Requires `codex` CLI.
 
 ### Design skills (auto by keyword)
 | Skill | Triggers |
@@ -36,6 +46,7 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 | `frontend-design` | "build landing", "create component" |
 | `ios-hig-design` | "iOS app", "SwiftUI", "HIG" |
 | `ui-ux-pro-max` | "design system", "SaaS dashboard", "e-commerce" |
+| `hallmark` | "hallmark", "hallmark audit/redesign/study", new landing/app page (anti-AI-slop structural variety) |
 
 ### way-stack commands
 - `/stack-bootstrap` — install / re-install the full stack
@@ -105,6 +116,25 @@ Greenfield — pick by size:
 
 **BMAD:** `/bmad:workflow-init` → `/bmad:product-brief` → `/bmad:prd` → `/bmad:architecture` → `/bmad:tech-spec` → `/bmad:sprint-planning` → `/bmad:create-story` → `/bmad:dev-story`
 
+## MODEL ROUTING — tier the model to the task
+
+Session running a bigger model than the task needs (or viceversa)? SAY SO at task start, one line:
+`> **Model:** task = [S/M/L] → suggest [model] (/model) — [reason ≤5 words]`
+The user decides and switches with `/model`; NEVER assume the switch happened. Applies MID-WORK too: when the phase changes tier (hard reasoning done → mechanical edits remain), emit the same one-liner at the boundary.
+
+- **Top tier** (Fable/Opus max): hard reasoning, architecture, gnarly debugging, long autonomous runs, high-stakes copy/strategy.
+- **Mid tier** (Opus/Sonnet): standard dev work, features, reviews, reports.
+- **Small tier** (Sonnet/Haiku): trivial/mechanical — renames, small edits, file ops, formatting, lookups.
+
+Subagents/workflows: apply the tiering YOURSELF via the `model` param (no ask needed) — mechanical stages → small, standard → inherit, only hardest verify/judge → top.
+
+- **Effort lever**: before suggesting a model DOWNGRADE, suggest `/effort medium|low` first — cuts most of the cost, often beats a smaller model at max effort on mid tasks.
+- **Advisor pattern**: heavy execution + occasional hard calls → `/model <mid>` + `/advisor <top>` (mid model executes, top model advises) instead of running everything on the top model.
+
+## CONTEXT HYGIENE — reference offload
+
+This file is the always-on program: keep it operational-only. Enumerated inventories (full skill lists, leaderboards, cheatsheets that grow) belong in a memory/reference file loaded on demand, not here. Same rule for `MEMORY.md` (lean index + `index_<topic>.md` sub-files) and for any doc injected every session. Audit with the `context-budget` skill when sessions feel heavy.
+
 ## DEFAULT OPERATING MODE — loop-first
 
 Non-trivial / repeat / long task → an **agentic loop**, not one-shot prompting: read state → prompt from fixed anchor files → run → **verify with an automated check (tests/typecheck)** → stop on pass / no-progress / budget → context-reset each iteration. Always set 3 hard stops: MAX iters, no-progress (same error / empty diff), budget (token/€). Via `/loop`, `ralph-loop`, or `gsd-autonomous`. Trivial one-offs: do directly. (This is Karpathy's `autoresearch` pattern: agent edits → runs → keeps if better → repeats.)
@@ -147,6 +177,13 @@ New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt 
 | ship | `/agent-ship` or framework equivalent |
 | stopping mid-task, fresh chat tomorrow | `/handoff` (writes `HANDOFF.md`) |
 | terse mode / less filler | `/caveman full` (off: "stop caveman") |
+| what's in this video | `/watch <url-or-path>` |
+| ambiguous decision / go-no-go | `council` skill |
+| high-stakes plan, harden it | `claudex-loop` |
+| memory bloated / noisy | `dream` skill |
+| what skills am I missing | `session-audit` |
+| sessions feel heavy / slow | `context-budget` |
+| restart with clean context | `/reboot` (handoff + auto-resume) |
 | keep it simple / no over-engineering | `/ponytail full` (off: "stop ponytail") |
 | polish / audit existing frontend | `/impeccable polish` / `/impeccable audit` |
 | what does the system remember about me | check `$cmem` recap at session start OR read `~/.claude/projects/<proj>/memory/MEMORY.md` |
