@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.2.0 — 2026-08-31
+
+### Removed
+- **SDD agent factory retired** — `/agent-spec|tasks|execute|verify|ship` commands, `create-agent` skill, and `references/sdd-framework.md` removed. Building an agent is now direct: write `~/.claude/agents/<name>.md` (guided by `references/agent-design-principles.md`, still bundled), keep it loop-driven, verify with `loop-design-check`. Multi-session planning goes through wayfinder; project structure through GSD/BMAD/gstack.
+
 ## v2.1.1 — 2026-08-31
 
 ### Added

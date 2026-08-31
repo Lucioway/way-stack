@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "way-stack",
-  "description": "Three-command Claude Code stack replicator: master orchestrator (model-tier routing + loop-first), PARA + Karpathy vault, SDD agent factory, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session hooks, auto-install of 10 upstream plugins, 8 design skills, and 3 optional frameworks (GSD, BMAD, gstack).",
+  "description": "Three-command Claude Code stack replicator: master orchestrator (model-tier routing + loop-first), PARA + Karpathy vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session hooks, auto-install of 10 upstream plugins, 8 design skills, and 3 optional frameworks (GSD, BMAD, gstack).",
   "owner": {
     "name": "Lucioway",
     "url": "https://github.com/Lucioway"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "way-stack",
-      "description": "Meta-plugin that bootstraps a full Claude Code dev stack in two commands. Orchestrator, vault, SDD flow, hooks, upstream deps.",
+      "description": "Meta-plugin that bootstraps a full Claude Code dev stack in two commands. Orchestrator, vault, memory, workflow skills, hooks, upstream deps.",
       "source": "./",
       "category": "meta"
     }

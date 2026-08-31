@@ -15,7 +15,7 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 ## TOOLING INVENTORY
 
 ### Plugins (global, auto-activate)
-- **way-stack** — this meta-plugin (orchestrator + vault skills + agent factory + handoff)
+- **way-stack** — this meta-plugin (orchestrator + vault skills + workflow skills + handoff)
 - **superpowers** — TDD, debug, brainstorming, worktrees, subagent-driven-dev, verification-before-completion, dispatching-parallel-agents, writing-skills, executing-plans
 - **frontend-design** — production-grade UI generation (triggers: "build UI", "design this")
 - **code-review** — parallel multi-agent review (`/code-review:code-review`)
@@ -61,8 +61,6 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 ### way-stack commands
 - `/stack-bootstrap` — install / re-install the full stack
 - `/stack-verify` — health check
-- `/agent-spec`, `/agent-tasks`, `/agent-execute`, `/agent-verify`, `/agent-ship` — SDD flow
-- Skill `create-agent` — Phase 0 intake (workflow → PROJECT_BRIEF.md)
 - Skills `vault-ingest`, `vault-query`, `vault-lint` — Karpathy LLM Wiki ops
 - Skill `handoff` — write `HANDOFF.md` so the next fresh-context agent can resume
 
@@ -76,7 +74,7 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 ### Step 1 — Classify intent
 
 1. **IDEATE** → `superpowers:brainstorming` or `/office-hours` (gstack)
-2. **NEW PROJECT (structured)** → `/agent-spec` (way-stack SDD) or BMAD / GSD if installed
+2. **NEW PROJECT (structured)** → wayfinder (planning) or BMAD / GSD if installed
    - **Work bigger than one session** → `wayfinder` (mattpocock-skills) is the DEFAULT planning layer: map of decision tickets, 1 ticket = 1 decision = 1 session, decisions persist on the map. Planning only, not execution. Composes with grilling / domain-modeling / research / prototype. Projects with an existing `.planning/` (GSD) → ask whether to migrate or finish in GSD.
 3. **ADD FEATURE** → `/gsd-new-milestone` or `/bmad:create-story` (framework-dependent)
 4. **BUG / DEBUG** → `superpowers:systematic-debugging`
@@ -84,10 +82,10 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 6. **CODE REVIEW** → `/code-review:code-review`
 7. **SECURITY AUDIT** → `/cso` (gstack) or `gsd-secure-phase`
 8. **QA / TESTING** → `superpowers:tdd`
-9. **DEPLOY / SHIP** → `/agent-ship` or framework equivalent
+9. **DEPLOY / SHIP** → `deploy-project` skill or framework equivalent
 10. **AUTONOMOUS LONG RUN** → `ralph-loop` or `gsd-autonomous`
 11. **GUI APP AUTOMATION** → `cli-anything`
-12. **BUILD NEW AGENT** → `create-agent` skill → `/agent-spec` → `/agent-tasks` → …
+12. **BUILD NEW AGENT** → write the agent directly as `~/.claude/agents/<name>.md` (frontmatter: name, description with spawn triggers, tools; see `references/agent-design-principles.md`). Output must be loop-driven (self-prompt + automated verification), never a one-shot wrapper. Verify with `loop-design-check`.
 13. **VAULT: ingest/query/lint** → corresponding vault-* skill
 
 #### Frontend Routing Table
@@ -106,22 +104,16 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 Check existing artifacts FIRST:
 - `.planning/` → GSD active
 - `bmad-output/` or `.bmad/` → BMAD active
-- `SPEC.md` + `TASKS.md` → way-stack SDD active
 - Project `CLAUDE.md` → follow what it declares
 
 Greenfield — pick by size:
 - **XS** (1 script / <2h) → no framework, superpowers + direct code
-- **S** (single feature, 1–3 days) → way-stack SDD (`/agent-spec`)
+- **S** (single feature, 1–3 days) → wayfinder map or GSD quick
 - **M** (multi-feature, 1+ weeks) → GSD full or BMAD (if installed)
 - **L** (full product, multi-role sim) → gstack (if installed)
-- **META** (building an AI agent) → `create-agent` skill
+- **META** (building an AI agent) → direct agent `.md`, loop-driven (see BUILD NEW AGENT)
 
 ### Step 3 — Canonical flows
-
-**way-stack SDD (default):**
-```
-/agent-spec → /agent-tasks → /agent-execute T-001 → /agent-execute T-002 → … → /agent-verify → /agent-ship
-```
 
 **GSD:** `/gsd-new-project` → `/gsd-discuss-phase` → `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-verify-work` → `/gsd-code-review` → `/gsd-ship`
 
@@ -150,16 +142,16 @@ This file is the always-on program: keep it operational-only. Enumerated invento
 
 Non-trivial / repeat / long task → an **agentic loop**, not one-shot prompting: read state → prompt from fixed anchor files → run → **verify with an automated check (tests/typecheck)** → stop on pass / no-progress / budget → context-reset each iteration. Always set 3 hard stops: MAX iters, no-progress (same error / empty diff), budget (token/€). Via `/loop`, `ralph-loop`, or `gsd-autonomous`. Trivial one-offs: do directly. (This is Karpathy's `autoresearch` pattern: agent edits → runs → keeps if better → repeats.)
 
-New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt + automated verification), never a one-shot wrapper.
+New agent? → write it directly as an agent `.md` (see BUILD NEW AGENT above); output must be loop-driven (self-prompt + automated verification), never a one-shot wrapper.
 
 ## HARD RULES
 
-1. ONE framework per project. No mixing SDD tasks + GSD phases.
+1. ONE framework per project. No mixing frameworks.
 2. Check existing artifacts before init.
 3. Plugins compose with ANY framework.
 4. No code before spec/plan (except XS trivial).
 5. Atomic commits. One task = one commit.
-6. Long work → SDD / GSD / ralph-loop (clean context per phase/iter).
+6. Long work → wayfinder / GSD / ralph-loop (clean context per phase/iter).
 7. Unsure? Ask user once with 3-option menu tied to size.
 8. Touching UI → `frontend-design` auto-skill activates.
 9. Before shipping → code-review + QA.
@@ -173,7 +165,7 @@ New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt 
 |---|---|
 | brainstorm | `superpowers:brainstorming` |
 | new project | ask size → pick framework |
-| build me an agent for X | `create-agent` skill |
+| build me an agent for X | direct agent `.md`, loop-driven |
 | bug | `superpowers:systematic-debugging` |
 | design UI | `frontend-design` |
 | UI looks off | `refactoring-ui` |
@@ -185,7 +177,7 @@ New agent? → `create-agent` SDD flow; output must be loop-driven (self-prompt 
 | save this to vault | `vault-ingest` |
 | what do we know about X | `vault-query` |
 | vault health check | `vault-lint` |
-| ship | `/agent-ship` or framework equivalent |
+| ship | framework ship command |
 | stopping mid-task, fresh chat tomorrow | `/handoff` (writes `HANDOFF.md`) |
 | terse mode / less filler | `/caveman full` (off: "stop caveman") |
 | what's in this video | `/watch <url-or-path>` |
@@ -213,7 +205,7 @@ Start every non-trivial task with ONE line:
 > **Routing:** [framework] — [command] — [5-word reason]
 
 Examples:
-> **Routing:** way-stack SDD — `/agent-spec` — structured new project
+> **Routing:** wayfinder — decision-ticket map — multi-session project
 > **Routing:** superpowers — brainstorming — ideation, no scope yet
 > **Routing:** direct — no framework — XS trivial fix
 

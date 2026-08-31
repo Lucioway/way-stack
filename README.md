@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, Spec-Driven Development (SDD) agent factory, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 8 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 8 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
@@ -11,7 +11,6 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Master orchestrator** | `~/.claude/CLAUDE.md` — routing tree: classifies every request → picks the right skill/framework |
 | **Vault** | PARA folders (`00_INBOX`, `01_PROJECTS`, `02_KNOWLEDGE`, `03_REFERENCE`, `04_SESSIONS`) + Karpathy LLM Wiki (`index.md` + `log.md`) |
 | **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd` |
-| **Agent factory** | `/agent-spec` → `/agent-tasks` → `/agent-execute` → `/agent-verify` → `/agent-ship` — full SDD flow + bundled references (full SDD framework w/ Mega Prompt, agent design principles, CLI tools stack) |
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
@@ -21,7 +20,7 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max, **hallmark** |
-| **Bundled skills** | create-agent, **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
+| **Bundled skills** | **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
 | **Power skills fetched** | **qa-test** (adversarial front-end QA), **agent-browser** (browser automation CLI), **agent-reach** (multi-platform research) |
 | **Design system** | `shinen-design` skill — SHIN-EN 深淵: dark Japanese minimal monochrome for tool dashboards. One stylesheet (`shinen.css`, vanilla CSS, `.sn-*` classes) + signature ghosted step numerals. No frameworks, inlines into stdlib HTTP servers. |
 | **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
@@ -59,7 +58,7 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 
 | You say… | way-stack routes to… |
 |---|---|
-| "build me an agent that summarizes my inbox every morning" | `create-agent` skill → `/agent-spec` → SDD flow |
+| "build me an agent that summarizes my inbox every morning" | direct agent `.md` in `~/.claude/agents/`, loop-driven (`loop-design-check` before launch) |
 | "UI looks off, fix it" | `refactoring-ui` skill |
 | "what do we know about rate-limiting Gmail API?" | `vault-query` skill |
 | "save this article on RAG patterns" | `vault-ingest` skill |
@@ -72,13 +71,13 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 ```
 way-stack/
 ├── .claude-plugin/plugin.json
-├── commands/              # /stack-bootstrap, /stack-verify, /agent-*
-├── skills/                # create-agent, deploy-project, shinen-design, vault-{ingest,query,lint}
+├── commands/              # /stack-bootstrap, /stack-verify, /stack-publish, /caveman-commit
+├── skills/                # deploy-project, shinen-design, vault-{ingest,query,lint}, workflow + craft skills
 ├── hooks/                 # session log + auto-backup
 ├── templates/             # orchestrator CLAUDE.md, vault CLAUDE.md, project CLAUDE.md,
 │   ├── agent-monitor/     #   3D live dashboard for the agent fleet (monitor.py + Three.js)
 │   └── deploy-agent/      #   scriptable deploy CLI (scan → audit → auth → git → Vercel)
-├── references/            # SDD framework (full, w/ Mega Prompt), agent design principles, CLI tools stack
+├── references/            # agent design principles, CLI tools stack
 ├── README.md
 └── LICENSE                # MIT
 ```
@@ -110,11 +109,11 @@ way-stack does NOT redistribute these — it adds their marketplaces / runs thei
 
 ## Philosophy
 
-**Orchestrator + vault + SDD** is the minimum viable "pro" Claude Code setup. Everything else is optional layering.
+**Orchestrator + vault + memory** is the minimum viable "pro" Claude Code setup. Everything else is optional layering.
 
 - **Orchestrator** picks the tool. You stop hand-routing every request.
 - **Vault** persists what you learn across sessions. Claude reads it instead of re-asking.
-- **SDD** enforces spec → tasks → verify → ship. Stops the "Claude wrote 500 lines I didn't ask for" failure mode.
+- **Wayfinder / frameworks** enforce plan → build → verify → ship. Stops the "Claude wrote 500 lines I didn't ask for" failure mode.
 
 Everything else (gstack roles, BMAD agile, advanced debugging) layers cleanly on top if you want it.
 
