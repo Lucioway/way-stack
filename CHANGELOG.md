@@ -2,6 +2,11 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.2.1 — 2026-08-31
+
+### Removed
+- `design-sprint` and `hooked-ux` dropped from the fetched design skills (usage audit: never actually invoked; UI work flows through frontend-design / impeccable / hallmark / refactoring-ui).
+
 ## v2.2.0 — 2026-08-31
 
 ### Removed

@@ -21,7 +21,7 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 6. **Caveman installed** (own installer, not plugin) — PASS if ANY of: a `caveman-*.js`/`caveman-*.sh` file exists under `~/.claude/hooks/`, OR a caveman skill dir (`~/.claude/skills/caveman*`), OR a `caveman` reference in `~/.claude/settings.json`. (The `JuliusBrussee/caveman` installer detects each agent and wires itself in — exact artifact names vary by version, so don't hard-match old `caveman-activate.js`.)
 
-7. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `hooked-ux`, `design-sprint`, `ios-hig-design`, `ui-ux-pro-max`. (`frontend-design` is plugin-level, not listed here.)
+7. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `ios-hig-design`, `ui-ux-pro-max`, `hallmark`. (`frontend-design` is plugin-level, not listed here.)
 
 8. **Handoff skill** — `~/.claude/skills/handoff/SKILL.md` exists.
 

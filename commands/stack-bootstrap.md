@@ -1,6 +1,6 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches design skills (incl. hallmark), installs 3 frameworks (GSD, BMAD, gstack), bundles 8 workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, …). Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches 6 design skills (incl. hallmark), installs 3 frameworks (GSD, BMAD, gstack), bundles 8 workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, …). Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
@@ -139,8 +139,8 @@ The installer auto-detects every installed agent (Claude Code, Codex, Gemini, �
 ```bash
 mkdir -p ~/.claude/skills && cd ~/.claude/skills
 
-# wondelai/skills — 5 design skills
-for s in refactoring-ui ux-heuristics hooked-ux design-sprint ios-hig-design; do
+# wondelai/skills — 3 design skills
+for s in refactoring-ui ux-heuristics ios-hig-design; do
   if [ ! -d "$s" ]; then
     git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/wondelai/skills.git ".tmp-$s" 2>/dev/null && \
@@ -314,7 +314,7 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ Hooks registered (vault + reboot + caveman + claude-mem)
 ✓ 10 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable, watch, mattpocock-skills)
 ✓ Caveman hooks installed
-✓ 8 design skills fetched (incl. hallmark)
+✓ 6 design skills fetched (incl. hallmark)
 ✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
 ✓ 13 skills bundled (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
 ✓ Frameworks: GSD ✓ BMAD ✓ gstack ✓

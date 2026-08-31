@@ -51,8 +51,6 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 |---|---|
 | `refactoring-ui` | "UI off", "fix design", "hierarchy" |
 | `ux-heuristics` | "usability", "Nielsen", "heuristic review" |
-| `hooked-ux` | "retention", "habit loop", "engagement" |
-| `design-sprint` | "run a sprint", "ideation workshop" |
 | `frontend-design` | "build landing", "create component" |
 | `ios-hig-design` | "iOS app", "SwiftUI", "HIG" |
 | `ui-ux-pro-max` | "design system", "SaaS dashboard", "e-commerce" |
@@ -93,8 +91,6 @@ Priority: user instructions > project CLAUDE.md > this orchestrator > default be
 |---|---|---|
 | Audit existing UI | `refactoring-ui` | `/design-review` |
 | Usability audit | `ux-heuristics` | `/qa` |
-| Retention loop | `hooked-ux` | research skill |
-| Validate concept | `design-sprint` | `/office-hours` |
 | Generate component | `frontend-design` | framework UI phase |
 | iOS app | `ios-hig-design` | `frontend-design` |
 | Design system / SaaS | `ui-ux-pro-max` | `frontend-design` |
@@ -169,7 +165,6 @@ New agent? → write it directly as an agent `.md` (see BUILD NEW AGENT above); 
 | bug | `superpowers:systematic-debugging` |
 | design UI | `frontend-design` |
 | UI looks off | `refactoring-ui` |
-| retention / engagement | `hooked-ux` |
 | code review | `/code-review:code-review` |
 | security | `/cso` (if gstack) |
 | scrape web | firecrawl / opencli / `cli-anything` |

@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 8 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 6 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
@@ -19,7 +19,7 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Model routing** | Orchestrator suggests the right model tier per task (`/model`), the `/effort` lever before downgrading, and the advisor pattern (mid model executes, top model advises) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
-| **Design skills fetched** | refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design, ui-ux-pro-max, **hallmark** |
+| **Design skills fetched** | refactoring-ui, ux-heuristics, ios-hig-design, ui-ux-pro-max, **hallmark** |
 | **Bundled skills** | **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
 | **Power skills fetched** | **qa-test** (adversarial front-end QA), **agent-browser** (browser automation CLI), **agent-reach** (multi-platform research) |
 | **Design system** | `shinen-design` skill — SHIN-EN 深淵: dark Japanese minimal monochrome for tool dashboards. One stylesheet (`shinen.css`, vanilla CSS, `.sn-*` classes) + signature ghosted step numerals. No frameworks, inlines into stdlib HTTP servers. |
@@ -96,7 +96,7 @@ way-stack/
 | **ponytail** | DietrichGebert/ponytail | Lazy-senior-dev mode — simplest solution that works (YAGNI, stdlib first, shortest diff). `/ponytail lite\|full\|ultra` |
 | **impeccable** | pbakaus/impeccable | Frontend design fluency — 1 skill, 23 commands (`/impeccable polish\|audit\|critique\|…`), anti-pattern detection |
 | **graphify** | safishamsi/graphifyy (pip `graphifyy`) | Knowledge-graph builder + MCP server. `/graphify .` extracts entities/edges from any folder; MCP exposes graph to Claude (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`) |
-| refactoring-ui, ux-heuristics, hooked-ux, design-sprint, ios-hig-design | wondelai/skills | Design skills |
+| refactoring-ui, ux-heuristics, ios-hig-design | wondelai/skills | Design skills |
 | ui-ux-pro-max | nextlevelbuilder/ui-ux-pro-max-skill | Full design system skill |
 | **hallmark** | nutlope/hallmark | Anti-AI-slop structural variety for landing/app pages (audit/redesign/study verbs) |
 | **watch** | claude-video marketplace | `/watch <video>` — frames + transcript + Q&A on any video |
