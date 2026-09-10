@@ -2,6 +2,21 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.4.0 — 2026-09-10
+
+Sync-with-reality release. A full sweep of the reference machine found four things the plugin was still promising that were no longer true.
+
+### Removed
+- **gstack dropped entirely** (bootstrap STEP 11c, `/stack-verify` check 9, README rows). On the reference machine `~/.claude/skills/gstack/` was gone and all that survived were five broken symlinks (`connect-chrome`, `design-shotgun`, `investigate`, `setup-browser-cookies`, `setup-deploy`) — each one still showing up in the skill list, pointing nowhere. Its slash commands (`/office-hours`, `/qa`, `/cso`, `/ship`) had been dead routes in the orchestrator for weeks.
+- **`ux-heuristics` and `ios-hig-design`** dropped from the fetched design skills, same reason as `design-sprint`/`hooked-ux` in v2.2.1: never invoked. UI work goes through frontend-design → impeccable → hallmark → refactoring-ui. Design skills fetched: 5 → 3.
+
+### Changed
+- **wayfinder is documented as opt-in, not the default planning layer.** v2.1.1 declared it the replacement for GSD. It ships `disable-model-invocation: true`, so Claude never reaches for it on its own, and it wants a tracker configured per project — which means "default" was never true in practice. Planning routes back to GSD; wayfinder is there when you type it.
+- **`claude-mem` marked optional.** Claude Code now ships its own auto-memory (per-project `memory/` + a `MEMORY.md` index loaded every session). Running both means two memory systems writing in parallel and ~7 extra hooks per session. STEP 12 and `/stack-verify` check 5 say so; nothing else in the stack depends on it.
+
+### Added
+- **`/stack-verify` check 15 — dead skill links.** Finds symlinked `SKILL.md` files whose target no longer exists. That is exactly the failure that hid gstack's removal for weeks: the skill dirs stay, the list stays full, and nothing errors until something tries to read one.
+
 ## v2.3.0 — 2026-09-10
 
 ### Added

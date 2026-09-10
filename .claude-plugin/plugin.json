@@ -1,8 +1,8 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "way-stack",
-  "version": "2.3.0",
-  "description": "Meta-plugin that bootstraps a full Claude Code dev stack: master orchestrator (with model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream memory consolidation, session-audit, context-budget, council, claudex-loop plan hardening), plus one-command install of 10 upstream plugins (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable, watch, mattpocock-skills), 6 design skills (incl. hallmark), graphify knowledge-graph MCP, and 3 optional frameworks (GSD, BMAD v6, gstack), 5 agent-native CLI tools (unclog, opencli, gws, browser-harness, sandbox-runtime), and 6 Seedance video skills.",
+  "version": "2.4.0",
+  "description": "Meta-plugin that bootstraps a full Claude Code dev stack: master orchestrator (with model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream memory consolidation, session-audit, context-budget, council, claudex-loop plan hardening), plus one-command install of 9 upstream plugins (superpowers, frontend-design, code-review, ralph-loop, cli-anything, ponytail, impeccable, watch, mattpocock-skills), 3 design skills (refactoring-ui, ui-ux-pro-max, hallmark), graphify knowledge-graph MCP, 2 optional frameworks (GSD, BMAD v6), 5 agent-native CLI tools (unclog, opencli, gws, browser-harness, sandbox-runtime), and 6 Seedance video skills.",
   "author": {
     "name": "Lucioway",
     "url": "https://github.com/Lucioway"
@@ -43,7 +43,6 @@
     "agent-browser",
     "agent-reach",
     "loop-design-check",
-    "wayfinder",
     "unclog",
     "opencli",
     "gws",

@@ -1,6 +1,6 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches 6 design skills (incl. hallmark), installs 3 frameworks (GSD, BMAD, gstack), bundles 8 workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, …). Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches 3 design skills (incl. hallmark), installs 2 frameworks (GSD, BMAD), bundles 8 workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, …). Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
@@ -115,9 +115,9 @@ Then two more quality-of-life plugins:
 ```
 
 - **watch** — `/watch <video URL or path>`: downloads with yt-dlp, extracts frames + transcript, lets Claude answer questions about any video.
-- **mattpocock-skills** — process skills: **wayfinder** (multi-session planning as decision tickets — the default planning layer), diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, code-review, wizard (interactive bash walkthroughs for human-only steps), grilling (stress-test a plan).
+- **mattpocock-skills** — process skills: diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, code-review, wizard (interactive bash walkthroughs for human-only steps), grilling (stress-test a plan), and **wayfinder** (multi-session planning as decision tickets).
 
-After installing mattpocock-skills, run its one-time setup (configures the wayfinder tracker — github / gitlab / local markdown):
+> **wayfinder is opt-in, not the default planning layer.** It ships with `disable-model-invocation: true`, so Claude will never reach for it on its own — you type it. It also needs a tracker configured per project. Run the setup once if you want it; otherwise planning stays with GSD:
 
 ```
 /setup-matt-pocock-skills
@@ -139,8 +139,8 @@ The installer auto-detects every installed agent (Claude Code, Codex, Gemini, �
 ```bash
 mkdir -p ~/.claude/skills && cd ~/.claude/skills
 
-# wondelai/skills — 3 design skills
-for s in refactoring-ui ux-heuristics ios-hig-design; do
+# wondelai/skills — refactoring-ui (ux-heuristics + ios-hig-design dropped v2.4.0: never invoked)
+for s in refactoring-ui; do
   if [ ! -d "$s" ]; then
     git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/wondelai/skills.git ".tmp-$s" 2>/dev/null && \
@@ -271,7 +271,7 @@ And six engineering-craft skills, also bundled in the plugin:
 
 Frameworks are heavyweight (50–100+ skills each). Ask the user which to install. Default = ALL.
 
-> Install frameworks? GSD, BMAD, gstack — pick any/all/none. (default: all)
+> Install frameworks? GSD, BMAD — pick either/both/none. (default: both)
 
 ### 11a — GSD (Get-Shit-Done) — gsd-build/get-shit-done
 
@@ -291,19 +291,11 @@ npx -y bmad-method install
 
 Interactive installer. Pick `Claude Code` as host when prompted. Installs `~/.claude/skills/bmad/{core,bmm,bmb,cis}/` (15 `bmad:*` skills) + `bmad:*` slash commands.
 
-### 11c — gstack — garrytan/gstack
-
-```bash
-# Requires Bun (https://bun.sh) for build step
-git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
-cd ~/.claude/skills/gstack && ./setup
-```
-
-Installs ~38 gstack skills (`/office-hours`, `/qa`, `/cso`, `/review`, `/ship`, `/design-review`, `/retro`, …) + `browse` headless browser binary.
-
 If any framework install fails, log warning and continue — orchestrator template handles missing frameworks gracefully (marked "if installed").
 
 ## STEP 12 — Scaffold auto-memory directory
+
+> **Note (2026-09-10):** Claude Code now ships its own auto-memory (`~/.claude/projects/<project>/memory/` + a `MEMORY.md` index loaded every session). `claude-mem` predates it and still works, but running both means two memory systems writing in parallel and ~7 extra hooks per session. If you only want one, keep the native one and skip `claude-mem` in STEP 8 — the rest of the stack does not depend on it.
 
 `claude-mem` (installed STEP 8) needs a per-project memory dir. Create it lazily for the current project + a global one:
 
@@ -378,7 +370,7 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ 6 design skills fetched (incl. hallmark)
 ✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
 ✓ 13 skills bundled (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
-✓ Frameworks: GSD ✓ BMAD ✓ gstack ✓
+✓ Frameworks: GSD ✓ BMAD ✓
 ✓ Graphify CLI + skill + MCP server registered
 ⚠ 1 skill failed (nextlevelbuilder moved) — install manually
 ```

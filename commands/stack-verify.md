@@ -17,18 +17,17 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 4. **Hooks registered** — `~/.claude/settings.json` has `SessionEnd` entries pointing to both hook scripts.
 
-5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`, `claude-mem`.
+5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`. `claude-mem` is ⚠ (optional) — the native auto-memory covers the same need.
 
 6. **Caveman installed** (own installer, not plugin) — PASS if ANY of: a `caveman-*.js`/`caveman-*.sh` file exists under `~/.claude/hooks/`, OR a caveman skill dir (`~/.claude/skills/caveman*`), OR a `caveman` reference in `~/.claude/settings.json`. (The `JuliusBrussee/caveman` installer detects each agent and wires itself in — exact artifact names vary by version, so don't hard-match old `caveman-activate.js`.)
 
-7. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ux-heuristics`, `ios-hig-design`, `ui-ux-pro-max`, `hallmark`. (`frontend-design` is plugin-level, not listed here.)
+7. **Design skills** — confirm dirs under `~/.claude/skills/`: `refactoring-ui`, `ui-ux-pro-max`, `hallmark`. (`frontend-design` is plugin-level, not listed here.)
 
 8. **Handoff skill** — `~/.claude/skills/handoff/SKILL.md` exists.
 
 9. **Frameworks** (optional, ⚠ if missing — not ✗):
    - GSD: `~/.claude/get-shit-done/VERSION` exists + `~/.claude/skills/gsd-plan-phase/SKILL.md` present
    - BMAD: `~/.claude/skills/bmad/core/bmad-master/SKILL.md` present
-   - gstack: `~/.claude/skills/gstack/package.json` present + `browse/dist/browse` binary executable
 
 10. **Vault git repo** — `$VAULT/.git` exists (auto-backup hook no-op without it).
 
@@ -49,10 +48,12 @@ way-stack verify
 ✓ Orchestrator   — ~/.claude/CLAUDE.md (42 routing rules)
 ✓ Hooks          — session-log + auto-backup, both +x
 ✓ Hooks registered — SessionEnd wired
-✓ Plugins        — 6/6 installed
-⚠ Design skills  — 6/6 present, ui-ux-pro-max SKILL.md missing
-✓ Frameworks     — GSD ✓ BMAD ✓ gstack ✓
+✓ Plugins        — 5/5 installed
+⚠ Design skills  — 3/3 present, ui-ux-pro-max SKILL.md missing
+✓ Frameworks     — GSD ✓ BMAD ✓
 ✓ Vault git      — 12 commits
 
 Result: 7 ✓, 1 ⚠ — mostly healthy. Fix: re-run /stack-bootstrap step 9.
 ```
+
+15. **Dead skill links** — no broken symlinks under `~/.claude/skills/` (`find ~/.claude/skills -maxdepth 2 -type l ! -exec test -e {} \; -print`). A skill dir whose `SKILL.md` points nowhere still shows up in the skill list and wastes a lookup. ✗ if any found, with the paths.
