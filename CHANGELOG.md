@@ -2,6 +2,16 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.3.0 — 2026-09-10
+
+### Added
+- **Bootstrap STEP 9b — power CLI tools.** Five binaries that give agents a command line where they previously had a browser or a guess: `unclog` (audits what MCP servers / skills / CLAUDE.md cost the context window), `opencli` (turns any website into a CLI through your already-logged-in Chrome), `gws` (Google Workspace: Drive, Gmail, Calendar, Sheets, Docs, Admin), `browser-harness` (self-healing CDP control that survives a changed selector), `srt` (OS-level filesystem + network limits on agent-run code, from anthropic-experimental/sandbox-runtime).
+- **Three human-step-required tools documented as such.** `gws` OAuth, the OpenCLI Browser Bridge extension, and `browser-harness` recording consent are listed in a table with the reason each cannot be scripted. The bootstrap does not attempt them — all three touch the user's own accounts, browser session, or captured page content.
+- **`improve` skill** (shadcn) — the strongest available model audits a codebase and writes plans a cheaper model executes. Pairs with the orchestrator's existing model-tier routing.
+- **`opencli-browser` + `opencli-usage` skills** — the two core OpenCLI skills. The adapter/sitemap authors are left out until a job needs them.
+- **6 of 15 Seedance 2.0 × Higgsfield video skills** — `cinematic`, `motion-design-ad`, `ecommerce-ad`, `product-360`, `social-hook`, `fashion-lookbook`. The remaining 9 (cartoon, anime, fight-scenes, comic-to-video, music-video, food-beverage, real-estate, 3d-cgi) are deliberately skipped: each `SKILL.md` runs 900-2300 lines and its description loads every session.
+- **`/stack-verify` checks 13 and 14** cover the new binaries and skills, with ⚠ rather than ✗ for the two tools that are installed but not yet authenticated.
+
 ## v2.2.1 — 2026-08-31
 
 ### Removed

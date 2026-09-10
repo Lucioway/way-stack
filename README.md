@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 6 design skills, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 10 upstream plugins, 6 design skills, 5 agent-native CLI tools, and 3 optional frameworks (GSD, BMAD, gstack) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
@@ -22,6 +22,8 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Design skills fetched** | refactoring-ui, ux-heuristics, ios-hig-design, ui-ux-pro-max, **hallmark** |
 | **Bundled skills** | **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
 | **Power skills fetched** | **qa-test** (adversarial front-end QA), **agent-browser** (browser automation CLI), **agent-reach** (multi-platform research) |
+| **Power CLI tools** | **unclog** (context-cost audit), **opencli** (any website → CLI via your logged-in Chrome), **gws** (Google Workspace: Drive/Gmail/Calendar/Sheets/Docs), **browser-harness** (self-healing CDP control), **srt** (OS-level sandbox for agent-run code) |
+| **Audit & video skills** | **improve** (strong model audits, cheap model executes), **opencli-browser** + **opencli-usage**, 6× **seedance-\*** (Seedance 2.0 × Higgsfield video prompting: cinematic, motion-design-ad, ecommerce-ad, product-360, social-hook, fashion-lookbook) |
 | **Design system** | `shinen-design` skill — SHIN-EN 深淵: dark Japanese minimal monochrome for tool dashboards. One stylesheet (`shinen.css`, vanilla CSS, `.sn-*` classes) + signature ghosted step numerals. No frameworks, inlines into stdlib HTTP servers. |
 | **Frameworks (optional)** | GSD (90+ `gsd-*` skills), BMAD v6 (15 `bmad:*` skills), gstack (~38 skills + headless browser) |
 

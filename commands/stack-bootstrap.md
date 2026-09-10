@@ -177,6 +177,67 @@ Then three third-party power skills (fetched, not vendored):
 
 If `git clone` fails (repo moved / renamed), log warning and continue — don't halt.
 
+## STEP 9b — Power CLI tools (agent-native surfaces)
+
+Five binaries and three skill sets. Each one hands the agent a command line where it
+previously had only a browser or a guess.
+
+```bash
+# unclog — audit what MCP servers / skills / CLAUDE.md actually cost your context window
+command -v unclog >/dev/null 2>&1 || uv tool install unclog
+
+# browser-harness — self-healing CDP browser control (survives a changed selector)
+command -v browser-harness >/dev/null 2>&1 || uv tool install --python 3.12 browser-harness
+mkdir -p ~/.claude/skills/browser-harness && \
+  browser-harness skill > ~/.claude/skills/browser-harness/SKILL.md 2>/dev/null
+
+# sandbox-runtime — OS-level filesystem + network limits on agent-run code (binary: srt)
+command -v srt >/dev/null 2>&1 || npm install -g @anthropic-ai/sandbox-runtime
+
+# gws — Google Workspace CLI: Drive, Gmail, Calendar, Sheets, Docs, Admin
+command -v gws >/dev/null 2>&1 || npm install -g @googleworkspace/cli
+
+# opencli — turn any website into a CLI using your already-logged-in Chrome
+command -v opencli >/dev/null 2>&1 || npm install -g @jackwener/opencli
+```
+
+Three of these need one human step each, and the bootstrap must NOT attempt them:
+
+| Tool | Human step | Why it can't be scripted |
+|---|---|---|
+| `gws` | `gws auth setup && gws auth login` | OAuth against a Google Cloud project the user owns |
+| `opencli` | Install the Browser Bridge extension — <https://opencli.info/download> | Drives the user's logged-in Chrome session |
+| `browser-harness` | `browser-harness recordings enable` | Recordings capture page content; default is OFF, enable only on explicit consent |
+
+Then the fetched skill sets:
+
+```bash
+# opencli agent skills — the core two (adapter/sitemap authors on demand)
+npx -y skills@latest add jackwener/opencli --skill opencli-browser --skill opencli-usage
+
+# improve — strong model audits the codebase, cheap model executes the written plan
+npx -y skills@latest add shadcn/improve
+```
+
+And the Seedance 2.0 x Higgsfield video skills — 6 of 15, the ones that apply to
+product and ecommerce work:
+
+```bash
+mkdir -p ~/.claude/skills && cd ~/.claude/skills
+if [ ! -d seedance-ecommerce-ad ]; then
+  git clone --depth 1 https://github.com/beshuaxian/higgsfield-seedance2-jineng.git .tmp-sd 2>/dev/null && \
+  for d in 01-cinematic 06-motion-design-ad 07-ecommerce-ad 09-product-360 11-social-hook 13-fashion-lookbook; do
+    n=$(sed -n 's/^name: //p' ".tmp-sd/skills/$d/SKILL.md" | head -1)
+    [ -n "$n" ] && mkdir -p "$n" && cp ".tmp-sd/skills/$d/SKILL.md" "$n/SKILL.md"
+  done
+  rm -rf .tmp-sd
+fi
+```
+
+The other 9 (cartoon, anime, fight-scenes, comic-to-video, music-video, food-beverage,
+real-estate, 3d-cgi) are skipped on purpose: each `SKILL.md` runs 900-2300 lines and its
+description loads into context every session. Add one back only when a job needs it.
+
 ## STEP 10 — Bundled workflow skills
 
 The `handoff` skill writes `HANDOFF.md` so a fresh-context agent can resume work. Bundled with way-stack (no remote fetch):

@@ -36,6 +36,10 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 12. **Graphify** — `graphify` CLI on `$PATH` (`command -v graphify`) + `~/.claude/skills/graphify/` exists + `~/.claude.json` `mcpServers.graphify-vault` (or equivalent) registered. ⚠ if MCP server registered but `graph.json` doesn't exist yet — user just hasn't run `/graphify .` inside the vault.
 
+13. **Power CLI tools** — `command -v` for each: `unclog`, `browser-harness`, `srt`, `gws`, `opencli`. ⚠ (not ✗) for `gws` and `opencli` if the binary is present but unauthenticated — both need a one-time human step (`gws auth setup`; OpenCLI Browser Bridge extension) that the bootstrap deliberately does not attempt.
+
+14. **Fetched audit/video skills** — `~/.claude/skills/browser-harness/SKILL.md` exists; `improve` and `opencli-browser` resolve (either `~/.claude/skills/` or the project `.agents/skills/` dir `npx skills` writes to); at least one `seedance-*` dir present.
+
 ## Output format
 
 ```
