@@ -355,14 +355,14 @@ If any framework install fails, log warning and continue — orchestrator templa
 
 > **Note (2026-09-10):** Claude Code now ships its own auto-memory (`~/.claude/projects/<project>/memory/` + a `MEMORY.md` index loaded every session). `claude-mem` predates it and still works, but running both means two memory systems writing in parallel and ~7 extra hooks per session. If you only want one, keep the native one and skip `claude-mem` in STEP 8 — the rest of the stack does not depend on it.
 
-`claude-mem` (installed STEP 8) needs a per-project memory dir. Create it lazily for the current project + a global one:
+Make sure the projects directory exists (native auto-memory writes under it):
 
 ```bash
 mkdir -p ~/.claude/projects
 touch ~/.claude/projects/.gitkeep
 ```
 
-Per-project `memory/MEMORY.md` index files are auto-created by `claude-mem` on first session start. Nothing else to do here.
+Per-project `memory/MEMORY.md` index files are created by Claude Code on first use. Nothing else to do here.
 
 > **Convention — keep `MEMORY.md` lean.** It loads into every prompt, so it is pure context cost. Hold only identity + cross-project rules + one-line pointers; offload per-brand/per-project detail into `index_<topic>.md` sub-index files that get lazy-loaded only when that topic is in play. Re-fold the index whenever a section grows past ~15 entries.
 
