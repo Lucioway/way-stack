@@ -11,7 +11,7 @@
 
 ## Framework
 
-`<GSD | BMAD | gstack | way-stack-SDD | direct>` — pick one, do not mix.
+`<GSD | BMAD | direct>` — pick one, do not mix.
 
 ## Conventions
 

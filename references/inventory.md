@@ -22,6 +22,7 @@ Reference file, read on demand. The orchestrator (`~/.claude/CLAUDE.md`) points 
 - **council** — four-voice structured disagreement for go/no-go calls.
 - **claudex-loop** — plan hardening with an adversarial Codex review loop. Requires `codex` CLI.
 - **agent-harness-construction**, **click-path-audit**, **regex-vs-llm-structured-text**, **loop-design-check**, **skill-stocktake**, **rules-distill**.
+- **deploy-project** (ship to hosting), **shinen-design** (design language), **scrapling-official** (web scraping), **skillspector** (security scan of agent skills; needs the NVIDIA SkillSpector CLI).
 - **vault-ingest** / **vault-query** / **vault-lint** — Karpathy LLM Wiki ops.
 
 ## Fetched skills
