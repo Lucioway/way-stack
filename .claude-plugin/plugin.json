@@ -1,8 +1,8 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "way-stack",
-  "version": "2.4.0",
-  "description": "Meta-plugin that bootstraps a full Claude Code dev stack: master orchestrator (with model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream memory consolidation, session-audit, context-budget, council, claudex-loop plan hardening), plus one-command install of 9 upstream plugins (superpowers, frontend-design, code-review, ralph-loop, cli-anything, ponytail, impeccable, watch, mattpocock-skills), 3 design skills (refactoring-ui, ui-ux-pro-max, hallmark), graphify knowledge-graph MCP, 2 optional frameworks (GSD, BMAD v6), 5 agent-native CLI tools (unclog, opencli, gws, browser-harness, sandbox-runtime), and 6 Seedance video skills.",
+  "version": "2.5.0",
+  "description": "Meta-plugin that bootstraps a full Claude Code dev stack: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream memory consolidation, session-audit, context-budget, token-budget token management system, council, claudex-loop plan hardening), plus one-command install of 6 upstream plugins (superpowers, frontend-design, code-review, impeccable, watch, mattpocock-skills; ralph-loop, cli-anything, ponytail, claude-mem optional), cost controls (Sonnet subagents, 1M context off, on-demand grounding kit), 3 design skills (refactoring-ui, ui-ux-pro-max, hallmark), graphify knowledge-graph MCP, 2 optional frameworks (GSD, BMAD v6), 5 agent-native CLI tools (unclog, opencli, gws, browser-harness, sandbox-runtime), and 6 Seedance video skills.",
   "author": {
     "name": "Lucioway",
     "url": "https://github.com/Lucioway"
@@ -34,6 +34,8 @@
     "reboot",
     "session-audit",
     "context-budget",
+    "token-budget",
+    "token-usage",
     "council",
     "claudex-loop",
     "hallmark",

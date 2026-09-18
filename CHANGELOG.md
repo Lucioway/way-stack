@@ -2,6 +2,33 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.5.0 — 2026-09-18
+
+Cost release. A week of token logs on the reference machine said the same thing from every angle: the bill is the context, not the model. Over half the turns ran above 200k tokens, and a fresh chat paid ~43k of config before the first word. This release ships the fixes.
+
+### Changed
+- **Orchestrator template rewritten lean: 222 lines → ~55, ~6 KB.** It loads into every prompt. The plugin/skill inventory, the design tables and the 35-row cheatsheet moved to `references/inventory.md`, installed as `~/.claude/way-stack-inventory.md` and read on demand. The template also finally catches up with v2.4.0 — it was still routing to gstack (`/office-hours`, `/cso`), listing `ux-heuristics` / `ios-hig-design`, and calling wayfinder the default.
+- **MODEL ROUTING is now head/arms.** The old rule told Claude to suggest `/model` downgrades at task boundaries; in practice a mid-task switch throws away the cache and the suggestion is noise. New rule: the strongest model stays the main session at standard context and low effort; everything delegable goes to subagents on cheap models, chosen without asking. Custom agents carry `model:` in frontmatter; `agent()` in workflows and `claude -p` loops always pass an explicit model. One manual step remains: near the weekly cap → `/model opusplan`.
+- **ralph-loop, cli-anything, ponytail join claude-mem as optional, default off.** Native `/loop` and saved Workflows cover ralph-loop; the other two were switched off in the context diet and nobody noticed. Plugins auto-installed: 9 → 6.
+
+### Added
+- **`token-budget` skill — the whole token management system, bundled.** Four scripts plus the playbook:
+  - `token_tracker.py` — reads every transcript under `~/.claude/projects/`, dedupes by message id, and reports per day and model: turns, total, cache read/write, output, **Ctx/turn** and **% of turns above 200k**. Those two numbers are the system. Also books Codex CLI sessions. Keeps a merged db so old days survive transcript cleanup; `--summary` emits today + 7 days as JSON.
+  - `ctx_guard.py` — `Stop` hook: one line after every turn (`🟢 ctx 78k (39%)`), and a handoff nudge past 140k.
+  - `baseline.sh` — what an empty chat costs. On the reference machine: 87.7k → 68.8k after the diet, of which 44k is fixed system prompt.
+  - `api_map.py` — headless cheap-model loop that appends a `## API MAP` table to each project `CLAUDE.md` from grep evidence only. Append-only, re-runnable, three hard stops.
+  - The skill documents the context-diet order (MEMORY.md → CLAUDE.md → agents → skills → MCP → plugins → echo hooks), agent right-sizing, and the habits tooling cannot enforce.
+  - Result it produced where it was built: Ctx/turn 200-230k → 78k, turns above 200k 30-42% → 0%.
+- **Bootstrap STEP 6b** installs the scripts to `~/.claude/token-budget/bin/`, registers the Stop hook, offers the 23:55 schedule (LaunchAgent / cron), and records a first baseline.
+- **Bootstrap STEP 6 — six env vars.** `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` (without `_FORCE`, so agents that declare a model keep it), `CLAUDE_CODE_DISABLE_1M_CONTEXT=1`, `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=75`, both prompt-cache TTLs at `1h` (watch Cache write for two days, remove if it jumps), `BASH_MAX_OUTPUT_LENGTH=12000`.
+- **Grounding kit** — `templates/mcp-grounding.json` (context7 + serena) → `~/.claude/mcp-grounding.json`, started per session with `claude --mcp-config`, never registered globally. Plus the orchestrator rule that fixed "the cheaper model says the API doesn't exist": never claim something does not exist before checking the project `## API MAP`, grepping, and naming what was searched. It was a grounding problem, not an intelligence one.
+- **CLOSING SUMMARY** section — every work reply ends with what truly changed and what needs the user's hand.
+- **Handoff at ~150k tokens** as a hard rule; agent descriptions ≤130 chars.
+- **`/stack-verify` checks 16, 17, 18** — cost controls present and no `[1m]` model pinned; orchestrator ≤ 8 KB with no dead gstack routes; token-budget installed, scheduled, and latest Ctx/turn within bounds.
+
+### Not adopted, on purpose
+- External model routers / proxies (claude-code-router, LiteLLM, ccproxy). They need an API key — you pay twice — or replay the subscription OAuth token, which breaks the ToS. Hooks cannot switch models either.
+
 ## v2.4.0 — 2026-09-10
 
 Sync-with-reality release. A full sweep of the reference machine found four things the plugin was still promising that were no longer true.

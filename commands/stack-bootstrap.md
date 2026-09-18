@@ -1,6 +1,6 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + claude-mem (auto-memory) + caveman (terse mode) + ponytail (lazy-dev mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches 3 design skills (incl. hallmark), installs 2 frameworks (GSD, BMAD), bundles 8 workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, …). Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + caveman (terse mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches 3 design skills (incl. hallmark), installs 2 frameworks (GSD, BMAD), bundles 9 workflow skills (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, …), installs the token management system (tracker, context line, cost env vars). Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
@@ -31,7 +31,17 @@ Copy `${CLAUDE_PLUGIN_ROOT}/templates/vault-CLAUDE.md` → `$VAULT/CLAUDE.md`. I
 
 ## STEP 4 — Write master orchestrator
 
-Copy `${CLAUDE_PLUGIN_ROOT}/templates/orchestrator-CLAUDE.md` → `~/.claude/CLAUDE.md`. If exists, back up to `~/.claude/CLAUDE.md.bak-$(date +%s)` first.
+Copy `${CLAUDE_PLUGIN_ROOT}/templates/orchestrator-CLAUDE.md` → `~/.claude/CLAUDE.md`. If exists, back up to `~/.claude/CLAUDE.md.bak-$(date +%s)` first. Replace the `{{VAULT_PATH}}` placeholder with the real vault path.
+
+The template is deliberately lean (it loads into every prompt). The full inventory + cheatsheet ship as a separate on-demand reference, plus the grounding kit:
+
+```bash
+cp "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md
+[ -f ~/.claude/mcp-grounding.json ] || cp "${CLAUDE_PLUGIN_ROOT}/templates/mcp-grounding.json" ~/.claude/mcp-grounding.json
+mkdir -p ~/.claude/workflows
+```
+
+`mcp-grounding.json` (context7 + serena) is NOT registered globally — it is opt-in per session: `claude --mcp-config ~/.claude/mcp-grounding.json`. An always-on MCP server is paid for in every prompt.
 
 ## STEP 5 — Install hooks
 
@@ -70,6 +80,49 @@ cp "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/ && chmod +x ~
 
 Preserve existing hooks — append, don't replace. Use `jq` if available.
 
+Also merge the two cost-control env vars (ask before overwriting an existing value):
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "75",
+    "CLAUDE_CODE_PROMPT_CACHE_TTL": "1h",
+    "CLAUDE_CODE_SUBAGENT_PROMPT_CACHE_TTL": "1h",
+    "BASH_MAX_OUTPUT_LENGTH": "12000"
+  }
+}
+```
+
+- `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` — generic subagents (Explore / Plan / general-purpose) run on Sonnet. Do NOT add the `_FORCE` variant: custom agents with `model:` in their frontmatter must keep it.
+- `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` — removes the `[1m]` context variants from the picker. Every turn re-pays the whole context; sessions that drift past 200k cost more than any model choice and reason worse.
+- The other four are explained in the `token-budget` skill (section 2), including when to take the 1h cache TTLs back out.
+
+### STEP 6b — Token management system
+
+Install the `token-budget` scripts, register the per-turn context line, schedule the daily tracker:
+
+```bash
+mkdir -p ~/.claude/token-budget/bin
+cp "${CLAUDE_PLUGIN_ROOT}/skills/token-budget/scripts/"* ~/.claude/token-budget/bin/
+chmod +x ~/.claude/token-budget/bin/*
+```
+
+Merge into `settings.json` hooks (append to any existing `Stop` array):
+
+```json
+{ "hooks": { "Stop": [ { "hooks": [{ "type": "command", "command": "python3 \"$HOME/.claude/token-budget/bin/ctx_guard.py\"" }] } ] } }
+```
+
+Daily run at 23:55 — ask before installing. macOS: write `~/Library/LaunchAgents/com.way-stack.token-tracker.plist` (ProgramArguments `/usr/bin/python3 ~/.claude/token-budget/bin/token_tracker.py` with the absolute home path, `StartCalendarInterval` Hour 23 Minute 55) then `launchctl load` it. Linux: add `55 23 * * * python3 $HOME/.claude/token-budget/bin/token_tracker.py >/dev/null 2>&1` to the user crontab.
+
+Finally record the starting point so later diets have a number to beat:
+
+```bash
+~/.claude/token-budget/bin/baseline.sh | tee ~/.claude/token-budget/baseline-$(date +%F).txt
+```
+
 ## STEP 7 — Add upstream marketplaces
 
 Run these Claude Code commands (use Bash tool with `claude` CLI, or instruct user to paste):
@@ -88,21 +141,25 @@ Run these Claude Code commands (use Bash tool with `claude` CLI, or instruct use
 /plugin install superpowers@claude-plugins-official
 /plugin install frontend-design@claude-plugins-official
 /plugin install code-review@claude-plugins-official
-/plugin install ralph-loop@claude-plugins-official
-/plugin install cli-anything@cli-anything
-/plugin install claude-mem@claude-mem
 ```
 
-Then add the two style/quality add-on marketplaces and install their plugins:
+Then the design add-on:
 
 ```
-/plugin marketplace add DietrichGebert/ponytail
-/plugin install ponytail@ponytail
 /plugin marketplace add pbakaus/impeccable
 /plugin install impeccable@impeccable
 ```
 
-- **ponytail** — lazy-senior-dev mode: forces the simplest solution that works (YAGNI, stdlib first). Toggle `/ponytail lite|full|ultra`, off via "stop ponytail".
+**Optional plugins — ask once, default NO.** Each adds skill descriptions and/or hooks to every session, and on the reference machine all four ended up switched off in the v2.5.0 context diet:
+
+```
+/plugin install ralph-loop@claude-plugins-official   # native /loop + saved Workflows cover it
+/plugin install cli-anything@cli-anything            # CLI wrappers for GUI apps
+/plugin install claude-mem@claude-mem                # native auto-memory covers it
+/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail                    # YAGNI mode, /ponytail lite|full|ultra
+```
+
 - **impeccable** — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + anti-pattern detection. Composes with `frontend-design`.
 
 Then two more quality-of-life plugins:
@@ -253,6 +310,7 @@ These further workflow skills ship inside the way-stack plugin itself (nothing t
 - **dream** — memory consolidation: merge duplicates, resolve contradictions, absolute dates, keep `MEMORY.md` under the ~24.4KB load limit
 - **session-audit** — monthly diagnosis of repeated manual tasks → propose new skills/automations
 - **context-budget** — audit context-window cost of agents/skills/MCP/rules, prioritized savings
+- **token-budget** — token management system: daily tracker, per-turn context line, baseline, diet playbook, `api_map.py` (scripts installed in STEP 6b)
 - **council** — four-voice structured disagreement for ambiguous decisions / go-no-go calls
 - **claudex-loop** — four-phase plan hardening with adversarial OpenAI Codex review (requires `codex` CLI; skip if not installed)
 
@@ -369,7 +427,7 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ Caveman hooks installed
 ✓ 6 design skills fetched (incl. hallmark)
 ✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
-✓ 13 skills bundled (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
+✓ 14 skills bundled (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
 ✓ Frameworks: GSD ✓ BMAD ✓
 ✓ Graphify CLI + skill + MCP server registered
 ⚠ 1 skill failed (nextlevelbuilder moved) — install manually

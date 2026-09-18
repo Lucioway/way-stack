@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: master orchestrator (model-tier routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, council, claudex-loop), session-persistence hooks, 9 upstream plugins, 3 design skills, 5 agent-native CLI tools, and 2 optional frameworks (GSD, BMAD) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, **token-budget**, council, claudex-loop), session-persistence hooks, 6 upstream plugins (4 more optional), 3 design skills, 5 agent-native CLI tools, and 2 optional frameworks (GSD, BMAD) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
@@ -14,13 +14,15 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
 | **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
-| **Plugins installed** | superpowers, frontend-design, code-review, ralph-loop, cli-anything, **ponytail** (lazy-dev mode), **impeccable** (design fluency), **watch** (video Q&A), **mattpocock-skills** (process skills). `claude-mem` is now optional — Claude Code ships its own auto-memory |
-| **Workflow skills (bundled)** | **handoff** (HANDOFF.md), **reboot** (handoff → /clear → auto-resume), **dream** (memory consolidation), **session-audit** (find missing skills monthly), **context-budget** (context-cost audit), **council** (4-voice decision panel), **claudex-loop** (plan hardening w/ adversarial Codex review) |
+| **Plugins installed** | superpowers, frontend-design, code-review, **impeccable** (design fluency), **watch** (video Q&A), **mattpocock-skills** (process skills). Optional since v2.5.0 (default off — each costs context every session): ralph-loop, cli-anything, ponytail, claude-mem |
+| **Token management (v2.5.0)** | `token-budget` skill: daily tracker (Ctx/turn, % turns >200k), per-turn context line, empty-chat baseline, context-diet playbook, `api_map.py`. Took the reference machine from 200-230k to 78k context per turn |
+| **Cost controls (v2.5.0)** | Lean ~6 KB orchestrator (inventory moved to an on-demand reference), head/arms model routing, `CLAUDE_CODE_SUBAGENT_MODEL=sonnet`, `[1m]` context disabled, on-demand grounding kit (`~/.claude/mcp-grounding.json`: context7 + serena), `## API MAP` convention |
+| **Workflow skills (bundled)** | **handoff** (HANDOFF.md), **reboot** (handoff → /clear → auto-resume), **dream** (memory consolidation), **session-audit** (find missing skills monthly), **context-budget** (context-cost audit), **token-budget** (token management system: tracker + context line + baseline + diet), **council** (4-voice decision panel), **claudex-loop** (plan hardening w/ adversarial Codex review) |
 | **Model routing** | Orchestrator suggests the right model tier per task (`/model`), the `/effort` lever before downgrading, and the advisor pattern (mid model executes, top model advises) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ui-ux-pro-max, **hallmark** (ux-heuristics + ios-hig-design dropped in v2.4.0 — never invoked in a year of use) |
-| **Bundled skills** | **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
+| **Bundled skills** | **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
 | **Power skills fetched** | **qa-test** (adversarial front-end QA), **agent-browser** (browser automation CLI), **agent-reach** (multi-platform research) |
 | **Power CLI tools** | **unclog** (context-cost audit), **opencli** (any website → CLI via your logged-in Chrome), **gws** (Google Workspace: Drive/Gmail/Calendar/Sheets/Docs), **browser-harness** (self-healing CDP control), **srt** (OS-level sandbox for agent-run code) |
 | **Audit & video skills** | **improve** (strong model audits, cheap model executes), **opencli-browser** + **opencli-usage**, 6× **seedance-\*** (Seedance 2.0 × Higgsfield video prompting: cinematic, motion-design-ad, ecommerce-ad, product-360, social-hook, fashion-lookbook) |
@@ -91,11 +93,11 @@ way-stack/
 | superpowers | anthropics/claude-plugins-official | TDD, debug, brainstorming, worktrees, verification-before-completion, dispatching-parallel-agents |
 | frontend-design | anthropics/claude-plugins-official | Production-grade UI generation |
 | code-review | anthropics/claude-plugins-official | Multi-agent parallel review |
-| ralph-loop | anthropics/claude-plugins-official | Autonomous iteration loop |
+| ralph-loop *(optional)* | anthropics/claude-plugins-official | Autonomous iteration loop |
 | cli-anything | HKUDS/CLI-Anything | GUI-OSS CLI wrappers |
 | claude-mem *(optional)* | thedotmack/claude-mem | Predates Claude Code's built-in auto-memory. Skip it unless you want the `$cmem` recap — running both means two memory systems and ~7 extra hooks per session |
 | caveman (hook-based) | JuliusBrussee/caveman | Terse-mode prompt compression — installed via its one-line `install.sh` (`curl … | bash`) |
-| **ponytail** | DietrichGebert/ponytail | Lazy-senior-dev mode — simplest solution that works (YAGNI, stdlib first, shortest diff). `/ponytail lite\|full\|ultra` |
+| **ponytail** *(optional)* | DietrichGebert/ponytail | Lazy-senior-dev mode — simplest solution that works (YAGNI, stdlib first, shortest diff). `/ponytail lite\|full\|ultra` |
 | **impeccable** | pbakaus/impeccable | Frontend design fluency — 1 skill, 23 commands (`/impeccable polish\|audit\|critique\|…`), anti-pattern detection |
 | **graphify** | safishamsi/graphifyy (pip `graphifyy`) | Knowledge-graph builder + MCP server. `/graphify .` extracts entities/edges from any folder; MCP exposes graph to Claude (`query_graph`, `get_node`, `get_neighbors`, `shortest_path`, `god_nodes`) |
 | refactoring-ui | wondelai/skills | Visual hierarchy / spacing / color audit |

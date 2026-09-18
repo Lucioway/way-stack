@@ -17,7 +17,7 @@ Run checks in order. For each, print ✓ / ✗ / ⚠ with one-line detail. Exit 
 
 4. **Hooks registered** — `~/.claude/settings.json` has `SessionEnd` entries pointing to both hook scripts.
 
-5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `ralph-loop`, `cli-anything`. `claude-mem` is ⚠ (optional) — the native auto-memory covers the same need.
+5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `impeccable`. `ralph-loop`, `cli-anything`, `ponytail`, `claude-mem` are optional since v2.5.0 — report as ℹ, never ✗.
 
 6. **Caveman installed** (own installer, not plugin) — PASS if ANY of: a `caveman-*.js`/`caveman-*.sh` file exists under `~/.claude/hooks/`, OR a caveman skill dir (`~/.claude/skills/caveman*`), OR a `caveman` reference in `~/.claude/settings.json`. (The `JuliusBrussee/caveman` installer detects each agent and wires itself in — exact artifact names vary by version, so don't hard-match old `caveman-activate.js`.)
 
@@ -57,3 +57,9 @@ Result: 7 ✓, 1 ⚠ — mostly healthy. Fix: re-run /stack-bootstrap step 9.
 ```
 
 15. **Dead skill links** — no broken symlinks under `~/.claude/skills/` (`find ~/.claude/skills -maxdepth 2 -type l ! -exec test -e {} \; -print`). A skill dir whose `SKILL.md` points nowhere still shows up in the skill list and wastes a lookup. ✗ if any found, with the paths.
+
+16. **Cost controls** — `~/.claude/settings.json` `env` has `CLAUDE_CODE_SUBAGENT_MODEL` (⚠ if missing: generic subagents inherit the main model) and `CLAUDE_CODE_DISABLE_1M_CONTEXT=1` (⚠ if missing). ✗ if `model` in settings ends with `[1m]`. `~/.claude/way-stack-inventory.md` and `~/.claude/mcp-grounding.json` exist.
+
+17. **Orchestrator is lean** — `wc -c ~/.claude/CLAUDE.md` ≤ 8000 bytes (⚠ above: it loads into every prompt; move lists to `~/.claude/way-stack-inventory.md`). ✗ if it still mentions `gstack` or `/office-hours` (dead routes from before v2.4.0).
+
+18. **Token management** — `~/.claude/token-budget/bin/{token_tracker.py,ctx_guard.py,api_map.py,baseline.sh}` exist; `settings.json` has a `Stop` hook pointing at `ctx_guard.py`; a daily schedule exists (`launchctl list | grep token-tracker` or `crontab -l | grep token_tracker`) — ⚠ if not. If `~/.claude/token-budget/db.json` exists, print the latest day's Ctx/turn and % >200k: ⚠ when Ctx/turn > 150k or >200k share > 5%.
