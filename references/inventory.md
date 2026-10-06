@@ -23,7 +23,15 @@ Reference file, read on demand. The orchestrator (`~/.claude/CLAUDE.md`) points 
 - **claudex-loop** — plan hardening with an adversarial Codex review loop. Requires `codex` CLI.
 - **agent-harness-construction**, **click-path-audit**, **regex-vs-llm-structured-text**, **loop-design-check**, **skill-stocktake**, **rules-distill**.
 - **deploy-project** (ship to hosting), **shinen-design** (design language), **scrapling-official** (web scraping), **skillspector** (security scan of agent skills; needs the NVIDIA SkillSpector CLI).
-- **vault-ingest** / **vault-query** / **vault-lint** — Karpathy LLM Wiki ops.
+- **vault-ingest** / **vault-query** / **vault-lint** — Karpathy LLM Wiki ops. `vault-ingest` converts Office files with `anydoc` first.
+- **vault-index** — idempotent auto-generated `index.md` at every vault folder level (`--vault`, `--dry`, `--follow-symlink`).
+
+## Behavior hooks
+- **prompt-reflex** (UserPromptSubmit, auto-registered by the plugin) — image path in prompt → Read it first; short status ping → answer in text now, no tools first.
+- **closing-guard** (Stop, OPT-IN via `/stack-bootstrap` STEP 6c) — blocks a work turn that lacks the `✅ Done` closing or ends with a needless "say go" permission-ask.
+
+## CLI tools
+- **anydoc** (`npm i -g @firecrawl/anydoc`) — docx/xlsx/pptx/pdf → Markdown, locally.
 
 ## Fetched skills
 - **qa-test**, **agent-browser**, **agent-reach**, **improve**, **opencli-browser** / **opencli-usage**
@@ -56,6 +64,7 @@ Project `CLAUDE.md` files carry a `## API MAP` table (name | file | entry point 
 | scrape web | `opencli` / `agent-browser` |
 | run overnight | `/loop`, `gsd-autonomous`, saved Workflow |
 | save this to vault | `vault-ingest` |
+| index the vault / refresh indexes | `vault-index` |
 | what do we know about X | `vault-query` |
 | vault health check | `vault-lint` |
 | stopping mid-task | `/handoff` |

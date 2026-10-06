@@ -123,6 +123,32 @@ Finally record the starting point so later diets have a number to beat:
 ~/.claude/token-budget/bin/baseline.sh | tee ~/.claude/token-budget/baseline-$(date +%F).txt
 ```
 
+### STEP 6c — Behavior hooks
+
+- **prompt-reflex** is registered automatically by the plugin (`hooks/hooks.json`, UserPromptSubmit): image paths in a prompt get read first, short status pings get an immediate text answer. Nothing to install.
+- **closing-guard** is OPT-IN because it blocks turns. Ask the user once: "Enforce the closing summary and block 'say go' permission-asks on finished work? (y/N)". If yes:
+
+```bash
+mkdir -p ~/.claude/hooks
+cp "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py
+cp ~/.claude/settings.json ~/.claude/settings.json.bak-$(date +%s) 2>/dev/null
+python3 - <<'PY'
+import json, os
+p = os.path.expanduser("~/.claude/settings.json")
+d = json.load(open(p)) if os.path.exists(p) else {}
+cmd = 'python3 "$HOME/.claude/hooks/closing-guard.py"'
+stop = d.setdefault("hooks", {}).setdefault("Stop", [])
+if not any(h.get("command") == cmd for e in stop for h in e.get("hooks", [])):
+    stop.append({"hooks": [{"type": "command", "command": cmd}]})   # append, never replace other hooks
+json.dump(d, open(p, "w"), indent=2)
+PY
+python3 ~/.claude/hooks/closing-guard.py --selftest
+```
+
+If no, skip; `/stack-verify` reports it as ⚠ (not ✗).
+
+- **vault-index** (optional): offer to schedule `skills/vault-index/scripts/vault_index.py --vault "$VAULT"` weekly (cron one-liner in the skill). Run it once now with `--dry`, then for real.
+
 ## STEP 7 — Add upstream marketplaces
 
 Run these Claude Code commands (use Bash tool with `claude` CLI, or instruct user to paste):
@@ -236,7 +262,7 @@ If `git clone` fails (repo moved / renamed), log warning and continue — don't 
 
 ## STEP 9b — Power CLI tools (agent-native surfaces)
 
-Five binaries and three skill sets. Each one hands the agent a command line where it
+Six binaries and three skill sets. Each one hands the agent a command line where it
 previously had only a browser or a guess.
 
 ```bash
@@ -256,6 +282,9 @@ command -v gws >/dev/null 2>&1 || npm install -g @googleworkspace/cli
 
 # opencli — turn any website into a CLI using your already-logged-in Chrome
 command -v opencli >/dev/null 2>&1 || npm install -g @jackwener/opencli
+
+# anydoc — Firecrawl: docx/xlsx/pptx/pdf to Markdown, locally (used by vault-ingest for Office input)
+command -v anydoc >/dev/null 2>&1 || npm install -g @firecrawl/anydoc
 ```
 
 Three of these need one human step each, and the bootstrap must NOT attempt them:

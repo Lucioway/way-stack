@@ -63,3 +63,9 @@ Result: 7 ✓, 1 ⚠ — mostly healthy. Fix: re-run /stack-bootstrap step 9.
 17. **Orchestrator is lean** — `wc -c ~/.claude/CLAUDE.md` ≤ 8000 bytes (⚠ above: it loads into every prompt; move lists to `~/.claude/way-stack-inventory.md`). ✗ if it still mentions `gstack` or `/office-hours` (dead routes from before v2.4.0).
 
 18. **Token management** — `~/.claude/token-budget/bin/{token_tracker.py,ctx_guard.py,api_map.py,baseline.sh}` exist; `settings.json` has a `Stop` hook pointing at `ctx_guard.py`; a daily schedule exists (`launchctl list | grep token-tracker` or `crontab -l | grep token_tracker`) — ⚠ if not. If `~/.claude/token-budget/db.json` exists, print the latest day's Ctx/turn and % >200k: ⚠ when Ctx/turn > 150k or >200k share > 5%.
+
+19. **Behavior hooks** — `hooks/hooks.json` of the installed plugin registers `prompt-reflex.py` under `UserPromptSubmit` (✗ if not). `closing-guard` is opt-in: if `~/.claude/hooks/closing-guard.py` exists, confirm `settings.json` has a `Stop` hook pointing at it and `python3 ~/.claude/hooks/closing-guard.py --selftest` passes; if absent, ⚠ "not opted in" (never ✗).
+
+20. **AnyDoc** — `command -v anydoc` (⚠ if missing: `vault-ingest` cannot convert Office files; `npm install -g @firecrawl/anydoc`).
+
+21. **vault-index** — the `vault-index` skill exists with `scripts/vault_index.py`, and `python3 <script> --vault "$VAULT" --dry` ends with `changes=0` (⚠ otherwise: run it once without `--dry`, then re-check).

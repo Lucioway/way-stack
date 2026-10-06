@@ -10,10 +10,10 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 |---|---|
 | **Master orchestrator** | `~/.claude/CLAUDE.md` — routing tree: classifies every request → picks the right skill/framework |
 | **Vault** | PARA folders (`00_INBOX`, `01_PROJECTS`, `02_KNOWLEDGE`, `03_REFERENCE`, `04_SESSIONS`) + Karpathy LLM Wiki (`index.md` + `log.md`) |
-| **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd` |
+| **Hooks** | Auto-session log + git auto-backup of vault on `SessionEnd`; **behavior hooks (v2.6.0)**: `prompt-reflex` (UserPromptSubmit: image paths get read first, status pings get an instant text answer) and opt-in `closing-guard` (Stop: enforces the closing summary, blocks permission-asks on finished work) |
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
-| **Vault skills** | `vault-ingest`, `vault-query`, `vault-lint` (Karpathy wiki ops) |
+| **Vault skills** | `vault-ingest` (converts Office files via AnyDoc first), `vault-query`, `vault-lint` (Karpathy wiki ops), **`vault-index`** (auto-generated `index.md` at every folder level, idempotent) |
 | **Plugins installed** | superpowers, frontend-design, code-review, **impeccable** (design fluency), **watch** (video Q&A), **mattpocock-skills** (process skills). Optional since v2.5.0 (default off — each costs context every session): ralph-loop, cli-anything, ponytail, claude-mem |
 | **Token management (v2.5.0)** | `token-budget` skill: daily tracker (Ctx/turn, % turns >200k), per-turn context line, empty-chat baseline, context-diet playbook, `api_map.py`. Took the reference machine from 200-230k to 78k context per turn |
 | **Cost controls (v2.5.0)** | Lean ~6 KB orchestrator (inventory moved to an on-demand reference), head/arms model routing, `CLAUDE_CODE_SUBAGENT_MODEL=sonnet`, `[1m]` context disabled, on-demand grounding kit (`~/.claude/mcp-grounding.json`: context7 + serena), `## API MAP` convention |
@@ -24,7 +24,7 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Design skills fetched** | refactoring-ui, ui-ux-pro-max, **hallmark** (ux-heuristics + ios-hig-design dropped in v2.4.0 — never invoked in a year of use) |
 | **Bundled skills** | **deploy-project**, **shinen-design**, vault-ingest, vault-query, vault-lint, **handoff**, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill |
 | **Power skills fetched** | **qa-test** (adversarial front-end QA), **agent-browser** (browser automation CLI), **agent-reach** (multi-platform research) |
-| **Power CLI tools** | **unclog** (context-cost audit), **opencli** (any website → CLI via your logged-in Chrome), **gws** (Google Workspace: Drive/Gmail/Calendar/Sheets/Docs), **browser-harness** (self-healing CDP control), **srt** (OS-level sandbox for agent-run code) |
+| **Power CLI tools** | **unclog** (context-cost audit), **opencli** (any website → CLI via your logged-in Chrome), **anydoc** (Office/PDF → Markdown, local), **gws** (Google Workspace: Drive/Gmail/Calendar/Sheets/Docs), **browser-harness** (self-healing CDP control), **srt** (OS-level sandbox for agent-run code) |
 | **Audit & video skills** | **improve** (strong model audits, cheap model executes), **opencli-browser** + **opencli-usage**, 6× **seedance-\*** (Seedance 2.0 × Higgsfield video prompting: cinematic, motion-design-ad, ecommerce-ad, product-360, social-hook, fashion-lookbook) |
 | **Design system** | `shinen-design` skill — SHIN-EN 深淵: dark Japanese minimal monochrome for tool dashboards. One stylesheet (`shinen.css`, vanilla CSS, `.sn-*` classes) + signature ghosted step numerals. No frameworks, inlines into stdlib HTTP servers. |
 | **Frameworks (optional)** | GSD (`gsd-*` skills + `gsd-*` agents + workflow guard hooks), BMAD v6 (15 `bmad:*` skills). gstack removed in v2.4.0 |

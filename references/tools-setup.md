@@ -7,6 +7,7 @@ Companion tooling for way-stack agents. Install once, every generated agent bene
 ```bash
 brew install lazygit zoxide fzf ripgrep fd ast-grep difftastic shellcheck glow btop scc sd yq hyperfine
 npm install -g @jackwener/opencli
+npm install -g @firecrawl/anydoc
 ```
 
 Verify:
@@ -100,6 +101,19 @@ To discover available CLI tools, run: opencli list
 2. **TypeScript Injection Engine** — for complex sites with dynamic rendering, infinite scroll, auth.
 3. **Anti-detection** — 7 automatic patches via CDP (Chrome DevTools Protocol).
 4. **Dynamic Loader** — drop a `.ts` or `.yaml` file in `clis/` = new command auto-registered.
+
+---
+
+## AnyDoc — Office/PDF to Markdown, locally
+
+Firecrawl's converter turns docx, xlsx, pptx, pdf and other document formats into Markdown on your machine (no upload, no API key), so an agent can read or ingest them as plain text.
+
+```bash
+npm install -g @firecrawl/anydoc
+anydoc report.docx -o report.md      # usage: anydoc <file> -o <file>.md
+```
+
+Use it as the first step of `vault-ingest` when the source is an Office file; keep the original in the raw folder.
 
 ---
 

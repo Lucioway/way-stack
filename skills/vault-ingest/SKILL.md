@@ -18,6 +18,7 @@ Or drops a URL / file / long paste and expects it saved for later retrieval.
 
 ## Process
 
+0. **Office input** — if the source is docx/xlsx/pptx/pdf (or similar), convert it first: `anydoc <file> -o <file>.md` (`npm install -g @firecrawl/anydoc`). Ingest the resulting `.md`; keep the original file in the raw folder (`00_INBOX/` or the project's raw dir). No `anydoc`? Say so and fall back to the Read tool (PDF) or ask for text.
 1. **Read source** — file, URL, or pasted text
 2. **Discuss takeaways** with user in chat — confirm what's worth keeping vs noise
 3. **Classify target folder**:

@@ -2,6 +2,21 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.6.0 — 2026-10-06
+
+Reflex release. Thirty-one days of transcripts on the reference machine were mined for one thing: what does the user keep asking twice? Three asks dominated — ~600 "go / proceed" replies to closings that handed back work Claude could have finished, ~520 prompts carrying a screenshot path the model then asked about instead of opening, ~150 "done?" pings answered with another round of tool calls. Every one of those rules was already in memory. Memory did not enforce them; hooks do.
+
+### Added
+- **`prompt-reflex` hook (UserPromptSubmit, auto-registered).** An image path in the prompt → read every image first, and "these / this" means what is inside it. A short status ping ("done?", "where are we") → answer in text now, zero tool calls first. Injects context only, never blocks; any error passes silently.
+- **`closing-guard` hook (Stop, opt-in via bootstrap STEP 6c).** After a work turn it blocks once when the `✅ Done` closing is missing, or when a closing line asks for a go-ahead or a choice on reversible work without naming a real gate on that same line (ads, messages to people, deploy/live, money, deletion, accounts, sign-off, creative taste). One-shot by design: `stop_hook_active` passes, headless `sdk*` runs pass. `--selftest` ships with it. On the reference machine it fires on ~4% of closings.
+- **`vault-index` skill.** `vault_index.py` (stdlib) writes an `index.md` at every folder level of the vault, only between `auto-index` markers, so hand-written text survives. Skips git repos inside the vault, summarizes folders above 300 notes by month, idempotent (second run = 0 changes). Agents navigate the vault by index instead of by `ls`.
+- **AnyDoc** (Firecrawl) in STEP 9b: `anydoc file.docx -o file.md` converts Office files to Markdown locally. `vault-ingest` now converts Office input first and keeps the original in raw.
+- **Log mining step in `session-audit`**: count repeated asks over 30 days; for each cluster ≥10 propose the cheapest enforcement that works — hook if mechanical, skill if procedural, memory line only if neither.
+- **`/stack-verify` checks 19, 20, 21** — behavior hooks, anydoc on PATH, vault-index idempotent.
+
+### Changed
+- **Orchestrator template, UI rule:** ask the key questions first, then 2-3 genuinely different variants, then iterate only on the one the user picks. New rule 12: a repeated ask becomes a hook or a skill, not another memory line. Template stays at 6.4 KB.
+
 ## v2.5.0 — 2026-09-18
 
 Cost release. A week of token logs on the reference machine said the same thing from every angle: the bill is the context, not the model. Over half the turns ran above 200k tokens, and a fresh chat paid ~43k of config before the first word. This release ships the fixes.

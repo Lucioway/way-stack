@@ -28,10 +28,11 @@ Intent shortcuts: bug → `superpowers:systematic-debugging` · ideate → `supe
 5. Atomic commits, one task = one commit.
 6. Context hygiene: long work → GSD execute-phase, a loop, or a saved `Workflow` (`~/.claude/workflows/`). Hand off at ~150k tokens (`/handoff` then `/reboot`); never ride to compaction.
 7. Unsure which framework → ask once, 3 options by size.
-8. UI → `frontend-design` skill; no hand styling unless the user says "plain HTML only".
+8. UI → `frontend-design` skill; no hand styling unless the user says "plain HTML only". Ask the key questions first, then 2-3 genuinely different variants, then iterate only on the one the user picks.
 9. Before ship → `/code-review:code-review` or `/gsd-code-review`, then `/gsd-verify-work` or `qa-test`.
 10. Memory (`~/.claude/projects/<proj>/memory/`): read `MEMORY.md` on the first turn; update it on new user / project / feedback facts. Native memory only — one memory system.
 11. If there is a real chance a skill applies, invoke it via the `Skill` tool before answering.
+12. The same ask or correction repeated in your own transcripts becomes a hook or a skill, not another memory line (log mining: `session-audit`).
 
 ## MODEL ROUTING — head and arms
 **Head** = the strongest model, standard 200K context, effort low, always the main session. Never suggest a `/model` downgrade to the user and never pick a `[1m]` context variant: every turn re-pays the whole context, so a 280k-token session costs more than the model choice does — and attention degrades with it.
