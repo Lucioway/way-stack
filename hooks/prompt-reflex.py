@@ -7,7 +7,11 @@ import json
 import re
 import sys
 
-IMG = re.compile(r"((?:~|\.{0,2})/[^\n\"']*?\.(?:png|jpe?g|heic|webp|gif))", re.I)
+# Local paths only: not inside URLs, no hopping across " /next/path" (spaces allowed, e.g. macOS
+# "Screenshot 2026-01-01 at 10.00.00.png").
+IMG = re.compile(
+    r"(?<![\w:/.~])(~?\.{0,2}/(?:[^\s\"'<>|]|[ \t](?![/~]))*?\.(?:png|jpe?g|heic|webp|gif))(?!\w)", re.I
+)
 STATUS = re.compile(
     r"\b(done|finished|status|where are we|where we at|how'?s it going|how is it going|"
     r"what'?s left|what is left|what do i (?:need|have) to do|what should i do|"
@@ -16,8 +20,18 @@ STATUS = re.compile(
 )
 
 
+def is_status_ping(prompt: str) -> bool:
+    """Short prompt that IS a status question: keyword + ends with '?', or opens with the keyword.
+    "fix the header, done when tests pass" is an instruction, not a ping."""
+    if len(prompt) > 80 or not STATUS.search(prompt):
+        return False
+    return prompt.rstrip().endswith("?") or bool(STATUS.match(prompt.lstrip(" ,.!-")))
+
+
 def build(prompt: str):
     ctx = []
+    if "<task-notification>" in prompt:  # background-agent events are not user prompts
+        return ctx
     paths = list(dict.fromkeys(p.strip() for p in IMG.findall(prompt)))
     if paths:
         ctx.append(
@@ -25,7 +39,7 @@ def build(prompt: str):
             "Read every one of them with the Read tool and look at what is inside. 'these/this' in "
             "the prompt refers to what is inside the image. Never ask the user what it shows."
         )
-    if len(prompt) <= 80 and not paths and STATUS.search(prompt):
+    if not paths and is_status_ping(prompt):
         ctx.append(
             "[Status] The user is asking for status. Answer NOW in plain text with zero tool calls "
             "first: what is done, what is still running, what is left, what needs the user. "

@@ -110,10 +110,10 @@ def is_headless(path: Path) -> bool:
 
 
 def decide(payload: dict) -> dict:
-    if payload.get("stop_hook_active"):
+    if not isinstance(payload, dict) or payload.get("stop_hook_active"):
         return {}
     p = payload.get("transcript_path")
-    if not p or not Path(p).exists() or is_headless(Path(p)):
+    if not isinstance(p, str) or not p or not Path(p).is_file() or is_headless(Path(p)):
         return {}
     try:
         had_tool, text = last_turn(Path(p))
@@ -143,7 +143,9 @@ def selftest() -> int:
         assert not unjustified_go_ask(t), ("should pass", t)
     assert decide({"stop_hook_active": True}) == {}
     assert decide({}) == {}
-    print("selftest ok:", len(bad) + len(good) + 2, "asserts")
+    assert decide([]) == {}
+    assert decide({"transcript_path": 5}) == {}
+    print("selftest ok:", len(bad) + len(good) + 4, "asserts")
     return 0
 
 
@@ -157,7 +159,10 @@ def main() -> int:
         payload = json.load(sys.stdin)
     except Exception:
         return 0
-    out = decide(payload)
+    try:
+        out = decide(payload)
+    except Exception:  # a guard must never crash the session
+        return 0
     if out:
         print(json.dumps(out))
     return 0

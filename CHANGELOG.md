@@ -2,6 +2,12 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.6.1 — Reflex fixes (2026-10-06)
+
+- `hooks/prompt-reflex.py`: image-path regex no longer matches inside URLs or hops across `" /next/path"` (spaces in macOS screenshot names still work); status reflex fires only on real pings (ends with `?` or opens with the keyword) so "fix X, done when tests pass" is left alone; background `<task-notification>` events are skipped.
+- `hooks/closing-guard.py`: never crashes on odd stdin (non-dict payload, non-string `transcript_path`); `--selftest` now 20 asserts.
+- README / plugin.json: CLI tools count = 6 (anydoc added in v2.6.0).
+
 ## v2.6.0 — 2026-10-06
 
 Reflex release. Thirty-one days of transcripts on the reference machine were mined for one thing: what does the user keep asking twice? Three asks dominated — ~600 "go / proceed" replies to closings that handed back work Claude could have finished, ~520 prompts carrying a screenshot path the model then asked about instead of opening, ~150 "done?" pings answered with another round of tool calls. Every one of those rules was already in memory. Memory did not enforce them; hooks do.

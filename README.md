@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, **token-budget**, council, claudex-loop), session-persistence hooks, 6 upstream plugins (4 more optional), 3 design skills, 5 agent-native CLI tools, and 2 optional frameworks (GSD, BMAD) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, **token-budget**, council, claudex-loop), session-persistence hooks, 6 upstream plugins (4 more optional), 3 design skills, 6 agent-native CLI tools, and 2 optional frameworks (GSD, BMAD) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
