@@ -79,6 +79,9 @@ def scan(path, seen, follow):
         if e.is_symlink():
             if e.is_dir():
                 if e.name in follow:
+                    if os.path.exists(os.path.join(e.path, ".git")):   # Sentinel I-3a631e: repo dietro il symlink
+                        n.repos.append(e.name)
+                        continue
                     c = scan(e.path, seen, follow)
                     if c:
                         n.subs.append((e.name, c))
@@ -125,13 +128,15 @@ def block(n):
 def apply(n, root, dry, stats):
     for _, c in n.subs:
         apply(c, root, dry, stats)
-    if n.total == 0:
-        return
     ip = os.path.join(n.path, "index.md")
+    if n.total == 0 and not os.path.exists(ip):
+        return
     b = block(n)
     if os.path.exists(ip):
         with open(ip, encoding="utf-8") as f:
             old = f.read()
+        if n.total == 0 and not (START in old and END in old):   # Sentinel I-194962: svuoto solo il blocco nostro
+            return
         if START in old and END in old:
             new = re.sub(re.escape(START) + r".*?" + re.escape(END), lambda m: b, old, count=1, flags=re.S)
         else:
@@ -147,8 +152,10 @@ def apply(n, root, dry, stats):
         return
     if old is not None and not os.path.exists(ip + ".bak"):
         shutil.copy2(ip, ip + ".bak")
-    with open(ip, "w", encoding="utf-8") as f:
+    tmp = ip + ".tmp"                      # Sentinel I-280d42: scrittura atomica
+    with open(tmp, "w", encoding="utf-8") as f:
         f.write(new)
+    os.replace(tmp, ip)
     stats["written"] += 1
 
 
@@ -164,6 +171,8 @@ def main():
     if not os.path.isdir(root):
         ap.error(f"not a directory: {root}")
     tree = scan(root, frozenset(), set(a.follow_symlink))
+    if tree is None:                       # Sentinel I-f6e457
+        ap.error(f"cannot read vault root (permission denied?): {root}")
     stats = {"changes": 0, "written": 0}
     apply(tree, root, a.dry, stats)
     print(f"vault_index: {'DRY ' if a.dry else ''}changes={stats['changes']} written={stats['written']} notes_total={tree.total}")
