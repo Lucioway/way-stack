@@ -73,7 +73,10 @@ def last_turn(path: Path):
         msg = m.get("message") or {}
         role = msg.get("role") or m.get("type")
         content = msg.get("content")
-        if role == "user" and (
+        # Sentinel I-05444f: un messaggio user con tool_result (anche con blocchi testo accanto) NON e' un utente vero
+        has_result = isinstance(content, list) and any(
+            isinstance(c, dict) and c.get("type") == "tool_result" for c in content)
+        if role == "user" and not has_result and (
             isinstance(content, str)
             or (isinstance(content, list) and any(c.get("type") == "text" for c in content if isinstance(c, dict)))
         ):
