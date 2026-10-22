@@ -9,9 +9,8 @@ Reference file, read on demand. The orchestrator (`~/.claude/CLAUDE.md`) points 
 - **code-review** — parallel multi-agent review (`/code-review:code-review`)
 - **impeccable** (`pbakaus/impeccable`) — frontend design fluency: `/impeccable polish|audit|critique|…`. Composes with `frontend-design`.
 - **watch** (`claude-video`) — `/watch <video>`: frames + transcript from any video URL/path, then Q&A. Video analysis = always `/watch`, never guess.
-- **mattpocock-skills** — diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, wizard, grilling. `wayfinder` is opt-in (needs `/setup-matt-pocock-skills` per project).
 - **caveman** (hook-based, not a plugin) — terse output; `/caveman lite|full|ultra`, off via "stop caveman".
-- *Optional, off by default* (each one adds skill descriptions / hooks to every session — install only if you use them): **ralph-loop** (native `/loop` + saved Workflows cover it), **cli-anything** (CLI wrappers for GUI apps), **ponytail** (YAGNI mode), **claude-mem** (native auto-memory covers it).
+- *Optional, off by default* (each one adds skill descriptions / hooks to every session — install only if you use them): **ralph-loop** (native `/loop` + saved Workflows cover it), **cli-anything** (CLI wrappers for GUI apps), **ponytail** (YAGNI mode), **claude-mem** (native auto-memory covers it), **mattpocock-skills** (since v2.7.0; superpowers covers the same process ground — `wayfinder` needs `/setup-matt-pocock-skills` per project).
 
 ## Bundled workflow skills
 - **handoff** / **reboot** — `HANDOFF.md` for fresh-context resume; `/reboot` = handoff → `/clear` → auto-resume.
@@ -29,6 +28,11 @@ Reference file, read on demand. The orchestrator (`~/.claude/CLAUDE.md`) points 
 ## Behavior hooks
 - **prompt-reflex** (UserPromptSubmit, auto-registered by the plugin) — image path in prompt → Read it first; short status ping → answer in text now, no tools first.
 - **closing-guard** (Stop, OPT-IN via `/stack-bootstrap` STEP 6c) — blocks a work turn that lacks the `✅ Done` closing or ends with a needless "say go" permission-ask.
+- **Guards (OPT-IN, STEP 6d)** — `post-edit-test` (tests next to an edited file, silent on pass), `big-read-guard` (no whole-file reads of big files), `compact-counter` (autocompact thrash), `no-overwrite-reports`, `keychain-guard` (macOS). Pattern: ⛔ line in CLAUDE.md + PreToolUse hook that denies.
+
+## Agents (plugin `agents/` dir, loaded automatically)
+- **custodian** — weekly audit of the orchestrator + memory (budget, broken links, duplicates, dead refs); mechanical fixes only.
+- **silent-failure-hunter** — read-only hunt for swallowed errors and bad fallbacks.
 
 ## CLI tools
 - **anydoc** (`npm i -g @firecrawl/anydoc`) — docx/xlsx/pptx/pdf → Markdown, locally.

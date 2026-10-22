@@ -69,3 +69,5 @@ Result: 7 ✓, 1 ⚠ — mostly healthy. Fix: re-run /stack-bootstrap step 9.
 20. **AnyDoc** — `command -v anydoc` (⚠ if missing: `vault-ingest` cannot convert Office files; `npm install -g @firecrawl/anydoc`).
 
 21. **vault-index** — the `vault-index` skill exists with `scripts/vault_index.py`, and `python3 <script> --vault "$VAULT" --dry` ends with `changes=0` (⚠ otherwise: run it once without `--dry`, then re-check).
+
+22. **Guard hooks + agents** — for each of `post-edit-test.py`, `big-read-guard.py`, `compact-counter.py`, `no-overwrite-reports.py`, `keychain-guard.py` present in `~/.claude/hooks/`: `settings.json` references it and `--selftest` passes (✗ if present but unregistered or failing; ⚠ "not opted in" if absent, never ✗). `agents/custodian.md` and `agents/silent-failure-hunter.md` exist in the installed plugin (✗ if missing). No `*.md` in subfolders of `~/.claude/agents/` (✗: subfolders get loaded as agents too).

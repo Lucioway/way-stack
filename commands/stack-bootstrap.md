@@ -1,6 +1,6 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + caveman (terse mode) + impeccable (design fluency) + watch (video) + mattpocock-skills, fetches 3 design skills (incl. hallmark), installs 2 frameworks (GSD, BMAD), bundles 9 workflow skills (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, …), installs the token management system (tracker, context line, cost env vars). Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + caveman (terse mode) + impeccable (design fluency) + watch (video) (+ optional mattpocock-skills), fetches 3 design skills (incl. hallmark), installs 2 frameworks (GSD, BMAD), bundles 9 workflow skills (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, …), installs the token management system (tracker, context line, cost env vars). Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
@@ -149,6 +149,45 @@ If no, skip; `/stack-verify` reports it as ⚠ (not ✗).
 
 - **vault-index** (optional): offer to schedule `skills/vault-index/scripts/vault_index.py --vault "$VAULT"` weekly (cron one-liner in the skill). Run it once now with `--dry`, then for real.
 
+### STEP 6d — Guard hooks + agents (v2.7.0)
+
+Guards are OPT-IN (they deny or block tool calls). Show the list and ask once which to enable (default: none):
+
+| Hook | Event · matcher | What it stops | Env (default) |
+|---|---|---|---|
+| `post-edit-test.py` | PostToolUse · `Edit\|Write\|MultiEdit` | an edit that breaks the tests next to it (silent on pass; opt-in per dir with `.claude-test`, or a `test_*.py` neighbour) | `CC_TEST_TIMEOUT` (90) |
+| `big-read-guard.py` | PreToolUse · `Read` | whole-file reads of text files over the limit (Claude retries with `limit`, greps, or delegates) | `CC_BIG_READ_BYTES` (40000) |
+| `compact-counter.py` | SessionStart · `compact` | autocompact thrash: context refilling within a few turns after each compaction | `CC_THRASH_TURNS` (8), `CC_THRASH_LIMIT` (105000) |
+| `no-overwrite-reports.py` | PreToolUse · `Write\|Edit\|MultiEdit` | overwriting an existing report export (write a new dated file instead) | `CC_REPORT_EXTS` (`.csv,.xlsx,.xls`) |
+| `keychain-guard.py` | PreToolUse · `Bash` | macOS only: commands that dump or print keychain secrets | — |
+
+For each one the user picks:
+
+```bash
+H=post-edit-test.py; EV=PostToolUse; M='Edit|Write|MultiEdit'      # set per hook from the table
+mkdir -p ~/.claude/hooks
+cp "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H
+cp ~/.claude/settings.json ~/.claude/settings.json.bak-$(date +%s) 2>/dev/null
+H="$H" EV="$EV" M="$M" python3 - <<'PY'
+import json, os
+p = os.path.expanduser("~/.claude/settings.json")
+d = json.load(open(p)) if os.path.exists(p) else {}
+cmd = f'python3 "$HOME/.claude/hooks/{os.environ["H"]}"'
+arr = d.setdefault("hooks", {}).setdefault(os.environ["EV"], [])
+if not any(h.get("command") == cmd for e in arr for h in e.get("hooks", [])):
+    arr.append({"matcher": os.environ["M"], "hooks": [{"type": "command", "command": cmd}]})   # append, never replace
+json.dump(d, open(p, "w"), indent=2)
+PY
+python3 ~/.claude/hooks/$H --selftest
+```
+
+**The pattern behind them** (also in the orchestrator, rule 13): a rule that must never break gets one ⛔ line in `CLAUDE.md` *and* a PreToolUse hook that denies the call. Write your own for whatever is irreversible in your world — paid ad accounts, messages to real people, production deploys, money. Copy `keychain-guard.py` as the skeleton: read stdin JSON, match the command, print a deny decision with the reason, exit 0 on any error.
+
+**Agents.** They ship in the plugin's `agents/` dir, which Claude Code loads on its own — nothing to copy. Each declares `model: sonnet`. Copy one into `~/.claude/agents/` only to customise it (then the copy is the one you edit).
+
+- **custodian** — audits `~/.claude/CLAUDE.md` + the memory dir: over line budget, broken links, duplicates, dead references, orphans. Applies mechanical fixes only, proposes the rest. Offer a weekly schedule (e.g. Sunday morning, `claude -p "custodian audit" --model sonnet` from cron/launchd).
+- **silent-failure-hunter** — read-only review for swallowed errors, bad fallbacks and lost error propagation. Spawn it on any diff that touches error handling.
+
 ## STEP 7 — Add upstream marketplaces
 
 Run these Claude Code commands (use Bash tool with `claude` CLI, or instruct user to paste):
@@ -188,16 +227,22 @@ Then the design add-on:
 
 - **impeccable** — frontend design fluency: 1 skill + 23 commands (`/impeccable polish|audit|critique|…`) + anti-pattern detection. Composes with `frontend-design`.
 
-Then two more quality-of-life plugins:
+Then one more quality-of-life plugin:
 
 ```
 /plugin marketplace add bradautomates/claude-video
 /plugin install watch@claude-video
+```
+
+- **watch** — `/watch <video URL or path>`: downloads with yt-dlp, extracts frames + transcript, lets Claude answer questions about any video.
+
+**Optional since v2.7.0 (default off — ask once):** mattpocock-skills. On the reference machine it sat unused next to superpowers, which covers the same process ground, and every enabled plugin costs context each session.
+
+```
 /plugin marketplace add mattpocock/skills
 /plugin install mattpocock-skills@mattpocock
 ```
 
-- **watch** — `/watch <video URL or path>`: downloads with yt-dlp, extracts frames + transcript, lets Claude answer questions about any video.
 - **mattpocock-skills** — process skills: diagnosing-bugs, tdd, prototype, research, domain-modeling, codebase-design, code-review, wizard (interactive bash walkthroughs for human-only steps), grilling (stress-test a plan), and **wayfinder** (multi-session planning as decision tickets).
 
 > **wayfinder is opt-in, not the default planning layer.** It ships with `disable-model-invocation: true`, so Claude will never reach for it on its own — you type it. It also needs a tracker configured per project. Run the setup once if you want it; otherwise planning stays with GSD:
@@ -451,10 +496,11 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ```
 ✓ Vault created at <path>
 ✓ Orchestrator installed
-✓ Hooks registered (vault + reboot + caveman + claude-mem)
-✓ 10 plugins installed (superpowers, frontend-design, code-review, ralph-loop, cli-anything, claude-mem, ponytail, impeccable, watch, mattpocock-skills)
+✓ Hooks registered (vault + reboot + prompt-reflex; opt-in: closing-guard + guards picked in STEP 6d)
+✓ 5 plugins installed (superpowers, frontend-design, code-review, impeccable, watch) + any optional ones the user said yes to
 ✓ Caveman hooks installed
-✓ 6 design skills fetched (incl. hallmark)
+✓ 3 design skills fetched (refactoring-ui, ui-ux-pro-max, hallmark)
+✓ 2 agents installed (custodian, silent-failure-hunter)
 ✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
 ✓ 14 skills bundled (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
 ✓ Frameworks: GSD ✓ BMAD ✓

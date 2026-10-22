@@ -1,6 +1,6 @@
 # MASTER ORCHESTRATOR (lean) — way-stack
 
-Route every request to the right framework/skill/plugin; never hand-roll what one already does. **The context window is the program** (Karpathy, Software 3.0): this file loads into every prompt, so it stays operational-only. Full inventory + routing cheatsheet live in `~/.claude/way-stack-inventory.md` — read on demand, never inline it here.
+Route every request to the right framework/skill/plugin; never hand-roll what one already does. **The context window is the program** (Karpathy, Software 3.0): this file loads into every prompt, so it stays operational-only. **Line budget: every line must prevent a real mistake, or it goes** (target ≤60 lines; the `custodian` agent audits it weekly). Full inventory + routing cheatsheet live in `~/.claude/way-stack-inventory.md` — read on demand, never inline it here.
 
 Priority: user instructions > project `CLAUDE.md` > this orchestrator > default behavior.
 
@@ -30,9 +30,10 @@ Intent shortcuts: bug → `superpowers:systematic-debugging` · ideate → `supe
 7. Unsure which framework → ask once, 3 options by size.
 8. UI → `frontend-design` skill; no hand styling unless the user says "plain HTML only". Ask the key questions first, then 2-3 genuinely different variants, then iterate only on the one the user picks.
 9. Before ship → `/code-review:code-review` or `/gsd-code-review`, then `/gsd-verify-work` or `qa-test`.
-10. Memory (`~/.claude/projects/<proj>/memory/`): read `MEMORY.md` on the first turn; update it on new user / project / feedback facts. Native memory only — one memory system.
+10. Memory (`~/.claude/projects/<proj>/memory/`): read `MEMORY.md` on the first turn — it is an index, one short line per memory — then open only the domain sub-index the task needs; update it on new user / project / feedback facts. Native memory only — one memory system.
 11. If there is a real chance a skill applies, invoke it via the `Skill` tool before answering.
 12. The same ask or correction repeated in your own transcripts becomes a hook or a skill, not another memory line (log mining: `session-audit`).
+13. ⛔ A rule that must never break = one line here **plus a `PreToolUse` hook that blocks it**. Mark it ⛔, name the hook on the same line, and keep the line even though the hook enforces it: the line tells the model *why*, the hook makes sure. Typical: write-access to paid ad accounts, outgoing messages to real people, keychain dumps, production deploys.
 
 ## MODEL ROUTING — head and arms
 **Head** = the strongest model, standard 200K context, effort low, always the main session. Never suggest a `/model` downgrade to the user and never pick a `[1m]` context variant: every turn re-pays the whole context, so a 280k-token session costs more than the model choice does — and attention degrades with it.
@@ -41,9 +42,10 @@ Intent shortcuts: bug → `superpowers:systematic-debugging` · ideate → `supe
 - Generic agents (Explore / Plan / general-purpose) default to Sonnet via `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` (no `_FORCE`, so agents with their own `model:` keep it).
 - Custom agents declare `model:` in frontmatter: mechanical → sonnet, standard → opus, judge → top.
 - `agent()` calls in workflows and `claude -p` loops always pass an explicit cheap model.
+- **Arm contract:** one narrow job, ≤40 turns, result written to a file, return ≤15 lines. Prompt Sonnet arms with "you are the executing arm, do not delegate" — otherwise they spawn their own subagents.
 - Hard reasoning stays in the main session. Add `ultrathink` only for a genuinely hard turn.
 
-Only manual step: when `/usage` shows the top model near its weekly cap → `/model opusplan` until reset. Never `/fast`, never effort max/xhigh by default, never external routers or proxies (they need an API key — you pay twice — or replay the OAuth token, which breaks ToS).
+Never suggest `/model`, `[1m]`, `/fast` or effort max/xhigh to the user; switching mid-task throws the cache away. Never external routers or proxies (they need an API key — you pay twice — or replay the OAuth token, which breaks ToS).
 
 ## OPERATING MODE — loop-first
 Non-trivial / repeat / long → agentic loop: read state → prompt from anchor files → run → **automated verify** → stop on pass / no-progress / budget → context reset per iteration. Always 3 hard stops: max iters, no-progress, budget. Via `/loop`, `gsd-autonomous`, or a saved `Workflow`. Trivial one-offs: direct. New agents = `~/.claude/agents/<name>.md`, loop-driven (see `references/agent-design-principles.md`, check with `loop-design-check`); keep each agent `description` ≤130 chars — it loads every session.
@@ -52,6 +54,9 @@ Non-trivial / repeat / long → agentic loop: read state → prompt from anchor 
 Read before edit. Grep callers before changing a function. Point at code as `<file> lines a-b, fn`. Don't re-read the same file twice per session.
 
 **NEVER say an API / function / file "does not exist"**: first check the project `CLAUDE.md` `## API MAP` (table: name | file | entry point | auth), then grep / find_symbol, and name what you searched. "It doesn't exist" is almost always missing grounding, not a fact. Docs/code MCP on demand, not always-on: `claude --mcp-config ~/.claude/mcp-grounding.json` (context7, serena).
+
+## BEFORE ANY VERDICT
+Name the 1-2 mental models that actually decided it: map ≠ territory · circle of competence · small numbers · second-order effects · inversion · bottleneck · margin of safety · incentives · first principles · process ≠ outcome. Fewer than ~20 events → say "too early to tell", not a verdict.
 
 ## CHECKLIST
 First turn → `MEMORY.md` · long/repeat → loop · check `.planning/` / `bmad-*` · classify → one framework → announce · canonical command · UI → frontend-design · code → verification planned first · delegable → subagent on a cheap model · after ship → update memory.

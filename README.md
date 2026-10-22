@@ -1,6 +1,6 @@
 # way-stack
 
-**One-link Claude Code stack replicator.** Three commands → full dev environment: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, **token-budget**, council, claudex-loop), session-persistence hooks, 6 upstream plugins (4 more optional), 3 design skills, 6 agent-native CLI tools, and 2 optional frameworks (GSD, BMAD) wired up.
+**One-link Claude Code stack replicator.** Three commands → full dev environment: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream, session-audit, context-budget, **token-budget**, council, claudex-loop), session-persistence hooks, 5 upstream plugins (5 more optional), 3 design skills, 6 agent-native CLI tools, and 2 optional frameworks (GSD, BMAD) wired up.
 
 Designed to replicate a complete Claude Code "pro" setup on any fresh machine in three commands.
 
@@ -14,11 +14,13 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Agent monitor** | `templates/agent-monitor/` — real-time 3D dashboard (WebSocket + Three.js) for your agent fleet: launchd/process/log state, errors, last outputs |
 | **Deploy agent** | `deploy-project` skill — conversational 10-step deploy pipeline to Vercel (preflight, deep scan, 5-level security audit, auth, build test, git, preview, production, registry) + scriptable Python CLI at `templates/deploy-agent/` |
 | **Vault skills** | `vault-ingest` (converts Office files via AnyDoc first), `vault-query`, `vault-lint` (Karpathy wiki ops), **`vault-index`** (auto-generated `index.md` at every folder level, idempotent) |
-| **Plugins installed** | superpowers, frontend-design, code-review, **impeccable** (design fluency), **watch** (video Q&A), **mattpocock-skills** (process skills). Optional since v2.5.0 (default off — each costs context every session): ralph-loop, cli-anything, ponytail, claude-mem |
+| **Plugins installed** | superpowers, frontend-design, code-review, **impeccable** (design fluency), **watch** (video Q&A). Optional (default off — each costs context every session): ralph-loop, cli-anything, ponytail, claude-mem, mattpocock-skills (since v2.7.0) |
 | **Token management (v2.5.0)** | `token-budget` skill: daily tracker (Ctx/turn, % turns >200k), per-turn context line, empty-chat baseline, context-diet playbook, `api_map.py`. Took the reference machine from 200-230k to 78k context per turn |
 | **Cost controls (v2.5.0)** | Lean ~6 KB orchestrator (inventory moved to an on-demand reference), head/arms model routing, `CLAUDE_CODE_SUBAGENT_MODEL=sonnet`, `[1m]` context disabled, on-demand grounding kit (`~/.claude/mcp-grounding.json`: context7 + serena), `## API MAP` convention |
 | **Workflow skills (bundled)** | **handoff** (HANDOFF.md), **reboot** (handoff → /clear → auto-resume), **dream** (memory consolidation), **session-audit** (find missing skills monthly), **context-budget** (context-cost audit), **token-budget** (token management system: tracker + context line + baseline + diet), **council** (4-voice decision panel), **claudex-loop** (plan hardening w/ adversarial Codex review) |
-| **Model routing** | Orchestrator suggests the right model tier per task (`/model`), the `/effort` lever before downgrading, and the advisor pattern (mid model executes, top model advises) |
+| **Model routing** | Head/arms: the strongest model stays the main session (never told to switch with `/model`); every delegable job goes to a cheap-model subagent under a fixed contract — one narrow job, ≤40 turns, result on file, ≤15-line return |
+| **Guard hooks (v2.7.0, opt-in)** | `post-edit-test` (runs the nearest test after an edit, silent on pass), `big-read-guard` (stops whole-file reads of huge files), `compact-counter` (catches autocompact thrash), `no-overwrite-reports`, `keychain-guard` (macOS) |
+| **Agents (v2.7.0)** | `custodian` (weekly audit of the orchestrator + memory: dead lines, duplicates, broken links, index over budget — mechanical fixes only) and `silent-failure-hunter` (finds swallowed errors and bad fallbacks) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ui-ux-pro-max, **hallmark** (ux-heuristics + ios-hig-design dropped in v2.4.0 — never invoked in a year of use) |

@@ -2,6 +2,25 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## v2.7.0 — Guards, agents, orchestrator v2 (2026-10-22)
+
+Sync-with-reality release, sixteen days after v2.6.1. What changed on the reference machine and held up in daily use is shipped here, stripped of anything personal.
+
+### Added
+- **Five opt-in guard hooks** (bootstrap STEP 6d, each with `--selftest`, thresholds via env vars, never crash on bad stdin):
+  - `post-edit-test.py` (PostToolUse) — runs the tests next to an edited file; silent on pass, feeds failures back to Claude. Opt-in per dir with `.claude-test`, opt-out with `.claude-notest`; never walks up into `$HOME` or temp dirs.
+  - `big-read-guard.py` (PreToolUse Read) — denies whole-file reads of text files over `CC_BIG_READ_BYTES` (40 KB); a whole-file read sits in context until the session ends.
+  - `compact-counter.py` (SessionStart compact) — detects autocompact thrash (context refilling within a few turns after each compaction) and tells Claude to push heavy work to subagents.
+  - `no-overwrite-reports.py` (PreToolUse) — stops overwriting existing report exports.
+  - `keychain-guard.py` (PreToolUse Bash, macOS) — denies commands that print keychain secrets; doubles as the skeleton for your own hard-rule guards.
+- **`agents/` dir, loaded by the plugin:** `custodian` (weekly audit of the orchestrator + memory: line budget, broken links, duplicates, dead references — mechanical fixes only, the rest proposed) and `silent-failure-hunter` (read-only hunt for swallowed errors). Both `model: sonnet`.
+- **`/stack-verify` check 22** — guards registered and passing selftest, agents present, no nested agent files.
+
+### Changed
+- **Orchestrator template → v2 patterns:** a line budget ("every line must prevent a real mistake, or it goes"); rule 13 — a never-break rule is one ⛔ line *plus* a PreToolUse hook that denies it; the arm contract (one narrow job, ≤40 turns, result on file, ≤15-line return, "you are the executing arm, do not delegate"); a pre-verdict mental-models checklist (<20 events = too early); `MEMORY.md` as an index that points to domain sub-indexes. The last `/model opusplan` suggestion is gone: the template never tells the user to switch models.
+- **mattpocock-skills is now optional** (default off). Auto-installed plugins: 6 → 5. Superpowers covers the same ground and every enabled plugin costs context each session.
+- **closing-guard** ignores fenced code and quoted passages (examples, not asks); the closing blockquote is still judged. **vault-index** hardening: repo symlinks excluded, emptied index handled, unreadable root, atomic writes. Both with regression tests.
+
 ## v2.6.1 — Reflex fixes (2026-10-06)
 
 - `hooks/prompt-reflex.py`: image-path regex no longer matches inside URLs or hops across `" /next/path"` (spaces in macOS screenshot names still work); status reflex fires only on real pings (ends with `?` or opens with the keyword) so "fix X, done when tests pass" is left alone; background `<task-notification>` events are skipped.
