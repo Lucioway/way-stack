@@ -7,13 +7,24 @@ description: "One-shot installer for the full way-stack — creates PARA+Karpath
 
 You are the way-stack bootstrap installer. Execute the 14-step install in order. Never skip verification.
 
-**Error policy (one rule).** REQUIRED steps (1-6: vault, orchestrator, hooks, hook registration) stop on any error: report the step and the exact error, change nothing further. OPTIONAL steps (7-13: marketplaces, plugins, design/power skills, CLIs, frameworks, graphify) print a `⚠` line with the remediation and continue. Step 14 always runs.
+**Error policy (one rule).** REQUIRED steps (1-6: vault, orchestrator, hooks, settings registration): on error, retry once; if it fails again, stop, report the step and the exact error, change nothing further. OPTIONAL steps (7-13: marketplaces, plugins, design skills, power skills/CLIs, frameworks, Graphify, MCP): print a `⚠` line with the remediation and continue. Step 14 always runs. Record the outcome (✓/⚠/✗) of every step as you go: STEP 14 reports from that record.
 
 **Backups.** Before copying any file into `~/.claude/` that may already exist, back it up if it differs. Define this helper once and re-define it in every shell call that uses it:
 
 ```bash
-bk() { [ -f "$2" ] && ! cmp -s "$1" "$2" && cp "$2" "$2.bak-waystack-$(date +%Y%m%d%H%M)"; return 0; }   # bk SRC DST
+# bk SRC DST: back up DST if it exists and differs from SRC. Returns 0 = backed up or not needed, non-zero = backup FAILED.
+# Seconds timestamp + numeric suffix: never overwrites an earlier backup.
+bk() {
+  [ -f "$2" ] || return 0
+  cmp -s "$1" "$2" && return 0
+  local b="$2.bak-waystack-$(date +%Y%m%d%H%M%S)" n=0
+  local base="$b"
+  while [ -e "$b" ]; do n=$((n+1)); b="$base.$n"; done
+  cp "$2" "$b"
+}
 ```
+
+Every call site is written `bk SRC DST && cp SRC DST`: if `bk` fails, the copy is skipped. In a REQUIRED step a `bk` failure counts as a step error (retry once, then stop); in an OPTIONAL step print `⚠ backup failed for <DST>, skipped` and continue. `settings.json` is backed up ONCE per bootstrap run, at the first merge (STEP 6, `bk /dev/null ~/.claude/settings.json`); later merges in the same run do not back it up again.
 
 ## STEP 1 — Ask vault path
 
@@ -44,8 +55,8 @@ Copy `${CLAUDE_PLUGIN_ROOT}/templates/orchestrator-CLAUDE.md` → `~/.claude/CLA
 The template is deliberately lean (it loads into every prompt). The full inventory + cheatsheet ship as a separate on-demand reference, plus the grounding kit:
 
 ```bash
-bk "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md
-cp "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md
+bk "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md && \
+  cp "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md
 [ -f ~/.claude/mcp-grounding.json ] || cp "${CLAUDE_PLUGIN_ROOT}/templates/mcp-grounding.json" ~/.claude/mcp-grounding.json
 mkdir -p ~/.claude/workflows
 ```
@@ -57,8 +68,8 @@ mkdir -p ~/.claude/workflows
 ```bash
 mkdir -p ~/.claude/hooks
 for f in vault-session-log.sh vault-auto-backup.sh; do
-  bk "${CLAUDE_PLUGIN_ROOT}/hooks/$f" ~/.claude/hooks/$f
-  cp "${CLAUDE_PLUGIN_ROOT}/hooks/$f" ~/.claude/hooks/
+  bk "${CLAUDE_PLUGIN_ROOT}/hooks/$f" ~/.claude/hooks/$f && \
+    cp "${CLAUDE_PLUGIN_ROOT}/hooks/$f" ~/.claude/hooks/ || exit 1
 done
 chmod +x ~/.claude/hooks/vault-*.sh
 ```
@@ -84,11 +95,11 @@ Read `~/.claude/settings.json` (create empty `{}` if absent). Merge in:
 Also copy the reboot hook (used by the bundled `reboot` skill):
 
 ```bash
-bk "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/reboot-resume.sh
-cp "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/ && chmod +x ~/.claude/hooks/reboot-resume.sh
+bk "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/reboot-resume.sh && \
+  cp "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/ && chmod +x ~/.claude/hooks/reboot-resume.sh
 ```
 
-Preserve existing hooks — append, don't replace. Use `jq` if available. Back up `settings.json` first (`cp ~/.claude/settings.json ~/.claude/settings.json.bak-waystack-$(date +%Y%m%d%H%M)`).
+Preserve existing hooks — append, don't replace. Use `jq` if available. Back up `settings.json` first, once for the whole run (`bk /dev/null ~/.claude/settings.json || exit 1`; if the file is absent or empty nothing is backed up). STEP 6c/6d merges do not back it up again.
 
 Also merge the two cost-control env vars (ask before overwriting an existing value):
 
@@ -116,7 +127,7 @@ Install the `token-budget` scripts, register the per-turn context line, schedule
 ```bash
 mkdir -p ~/.claude/token-budget/bin
 for f in "${CLAUDE_PLUGIN_ROOT}/skills/token-budget/scripts/"*; do
-  bk "$f" ~/.claude/token-budget/bin/$(basename "$f"); cp "$f" ~/.claude/token-budget/bin/
+  bk "$f" ~/.claude/token-budget/bin/$(basename "$f") && cp "$f" ~/.claude/token-budget/bin/ || exit 1
 done
 chmod +x ~/.claude/token-budget/bin/*
 ```
@@ -142,9 +153,9 @@ Finally record the starting point so later diets have a number to beat:
 
 ```bash
 mkdir -p ~/.claude/hooks
-bk "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py
-cp "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py
-cp ~/.claude/settings.json ~/.claude/settings.json.bak-waystack-$(date +%Y%m%d%H%M) 2>/dev/null
+bk "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py && \
+  cp "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py || exit 1
+# settings.json already backed up once in STEP 6: no second backup here
 python3 - <<'PY'
 import json, os
 p = os.path.expanduser("~/.claude/settings.json")
@@ -179,9 +190,9 @@ For each one the user picks:
 ```bash
 H=post-edit-test.py; EV=PostToolUse; M='Edit|Write|MultiEdit'      # set per hook from the table
 mkdir -p ~/.claude/hooks
-bk "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H
-cp "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H
-cp ~/.claude/settings.json ~/.claude/settings.json.bak-waystack-$(date +%Y%m%d%H%M) 2>/dev/null
+bk "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H && \
+  cp "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H || exit 1
+# settings.json already backed up once in STEP 6: no second backup here
 H="$H" EV="$EV" M="$M" python3 - <<'PY'
 import json, os
 p = os.path.expanduser("~/.claude/settings.json")
@@ -336,7 +347,9 @@ command -v unclog >/dev/null 2>&1 || uv tool install unclog
 # browser-harness — self-healing CDP browser control (survives a changed selector)
 command -v browser-harness >/dev/null 2>&1 || uv tool install --python 3.12 browser-harness
 mkdir -p ~/.claude/skills/browser-harness && \
-  browser-harness skill > ~/.claude/skills/browser-harness/SKILL.md 2>/dev/null
+  browser-harness skill > "${TMPDIR:-/tmp}/bh-skill.md" 2>/dev/null && [ -s "${TMPDIR:-/tmp}/bh-skill.md" ] && \
+  bk "${TMPDIR:-/tmp}/bh-skill.md" ~/.claude/skills/browser-harness/SKILL.md && \
+  cp "${TMPDIR:-/tmp}/bh-skill.md" ~/.claude/skills/browser-harness/SKILL.md || echo "⚠ browser-harness skill not written"
 
 # sandbox-runtime — OS-level filesystem + network limits on agent-run code (binary: srt)
 command -v srt >/dev/null 2>&1 || npm install -g @anthropic-ai/sandbox-runtime
@@ -374,11 +387,14 @@ product and ecommerce work:
 
 ```bash
 mkdir -p ~/.claude/skills && cd ~/.claude/skills
-if [ ! -d seedance-ecommerce-ad ]; then
+# six expected skills: seedance-cinematic, seedance-motion-design-ad, seedance-ecommerce-ad,
+# seedance-product-360, seedance-social-hook, seedance-fashion-lookbook (each needs its SKILL.md)
+if [ ! -f seedance-ecommerce-ad/SKILL.md ]; then
   git clone --depth 1 https://github.com/beshuaxian/higgsfield-seedance2-jineng.git .tmp-sd 2>/dev/null && \
   for d in 01-cinematic 06-motion-design-ad 07-ecommerce-ad 09-product-360 11-social-hook 13-fashion-lookbook; do
     n=$(sed -n 's/^name: //p' ".tmp-sd/skills/$d/SKILL.md" | head -1)
-    [ -n "$n" ] && mkdir -p "$n" && cp ".tmp-sd/skills/$d/SKILL.md" "$n/SKILL.md"
+    [ -n "$n" ] && mkdir -p "$n" && \
+      bk ".tmp-sd/skills/$d/SKILL.md" "$n/SKILL.md" && cp ".tmp-sd/skills/$d/SKILL.md" "$n/SKILL.md" || echo "⚠ seedance $d skipped"
   done
   rm -rf .tmp-sd
 fi
@@ -394,8 +410,8 @@ The `handoff` skill writes `HANDOFF.md` so a fresh-context agent can resume work
 
 ```bash
 mkdir -p ~/.claude/skills/handoff
-bk "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md
-cp "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md
+bk "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md && \
+  cp "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md || echo "⚠ handoff skill not installed"
 ```
 
 These further workflow skills ship inside the way-stack plugin itself (nothing to copy — active as soon as the plugin is installed):
@@ -408,7 +424,7 @@ These further workflow skills ship inside the way-stack plugin itself (nothing t
 - **council** — four-voice structured disagreement for ambiguous decisions / go-no-go calls
 - **claudex-loop** — four-phase plan hardening with adversarial OpenAI Codex review (requires `codex` CLI; skip if not installed)
 
-Plus command `/caveman-commit` (terse conventional commits).
+Plus command `/way-stack:caveman-commit` (terse conventional commits).
 
 And six engineering-craft skills, also bundled in the plugin:
 
@@ -513,26 +529,23 @@ If `claude mcp add` is not yet available in the installed CLI version, instead p
 
 ## STEP 14 — Verify install
 
-Run `/way-stack:stack-verify` (or `/stack-verify` if it shows in the menu). Report pass/fail summary to user:
+Run `/way-stack:stack-verify`, then print ONE summary line per step (1-13), using the outcome you recorded during the run. Never print a fixed list of ✓ lines.
+
+- `✓` = the step completed and was checked; `⚠` = optional step failed or was skipped (give the remediation); `✗` = required step failed (the run already stopped there).
+- Name the real artifacts: vault path, plugins actually installed, design/power skills actually fetched (and any that failed), frameworks only if chosen, Graphify CLI + skill (+ MCP only if chosen), closing-guard and other guards only if opted in.
+- End with the `/stack-verify` result line (counts of ✓ / ⚠ / ✗) and the manual follow-ups (`gws auth setup`, OpenCLI Browser Bridge).
+
+Example shape (illustrative only; the content comes from the actual run):
 
 ```
 ✓ Vault created at <path>
-✓ Orchestrator installed
-✓ Hooks registered (vault + reboot + prompt-reflex; opt-in: closing-guard + guards picked in STEP 6d)
-✓ 5 plugins installed (superpowers, frontend-design, code-review, impeccable, watch) + any optional ones the user said yes to
-✓ Caveman hooks installed
-✓ 3 design skills fetched (refactoring-ui, ui-ux-pro-max, hallmark)
-✓ 2 agents installed (custodian, silent-failure-hunter)
-✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
-✓ 22 skills bundled (21 in the plugin's skills/ + handoff: handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill, vault-*, skillspector, …)
-✓ Frameworks (if chosen): GSD ✓ — BMAD is per project, run it inside the project
-✓ Graphify CLI + skill (+ MCP server, if chosen)
-⚠ 1 skill failed (nextlevelbuilder moved) — install manually
+✓ Orchestrator installed (backup kept: CLAUDE.md.bak-...)
+⚠ Design skills: ui-ux-pro-max failed (repo moved), install manually
 ```
 
 ## Error handling
 
-- Required steps (1-6) stop on failure; optional steps (7-13) warn and continue (see the error policy at the top)
+- Required steps (1-6): retry once, then stop and explain. Optional steps (7-13): print `⚠` and continue (see the error policy at the top)
 - Any step that fails → print which step + exact error + remediation hint
 - Never rollback automatically — user's files are sacred
 - Idempotent: re-running `/stack-bootstrap` must be safe

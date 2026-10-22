@@ -5,39 +5,39 @@ description: "Health check for way-stack install. Verifies vault structure, orch
 
 # /stack-verify — Stack Health Check
 
-Run the 25 checks in order. For each, print ✓ / ✗ / ⚠ (or ℹ for optional items) with one-line detail. Exit 0 if no ✗, 1 if any ✗. This command is report-only.
+Run the 26 checks in order. For each, print ✓ / ✗ / ⚠ (or ℹ for info-only items) with one-line detail. **Severity rule (same as the bootstrap error policy):** REQUIRED components (vault, orchestrator, hooks, hook registration: checks 1-4) and config integrity faults (15 dead links, 16 `[1m]` model, 17 dead routes, 19 prompt-reflex, 22 failing/unregistered guard) are ✗; every OPTIONAL component (plugins, design skills, power skills/CLIs, frameworks, Graphify, MCP, watch, Seedance, opencli) missing is ⚠, never ✗. Exit 0 if no ✗, 1 if any ✗ (⚠ never changes the exit code). This command is report-only.
 
 ## Checks
 
-1. **Vault exists** — read user's configured vault path from `~/.claude/CLAUDE.md` or ask. Confirm PARA subdirs: `00_INBOX`, `01_PROJECTS`, `02_KNOWLEDGE/{patterns,decisions,retros,learnings}`, `03_REFERENCE`, `04_SESSIONS`, plus `index.md`, `log.md`.
+1. **Vault exists** (REQUIRED, ✗ if missing) — read user's configured vault path from `~/.claude/CLAUDE.md` or ask. Confirm PARA subdirs: `00_INBOX`, `01_PROJECTS`, `02_KNOWLEDGE/{patterns,decisions,retros,learnings}`, `03_REFERENCE`, `04_SESSIONS`, plus `index.md`, `log.md`.
 
-2. **Orchestrator present** — `~/.claude/CLAUDE.md` exists + contains `MASTER ORCHESTRATOR` marker.
+2. **Orchestrator present** (REQUIRED, ✗ if missing) — `~/.claude/CLAUDE.md` exists + contains `MASTER ORCHESTRATOR` marker.
 
-3. **Hooks installed** — `~/.claude/hooks/vault-session-log.sh` + `~/.claude/hooks/vault-auto-backup.sh` exist + executable.
+3. **Hooks installed** (REQUIRED, ✗ if missing) — `~/.claude/hooks/vault-session-log.sh` + `~/.claude/hooks/vault-auto-backup.sh` exist + executable.
 
-4. **Hooks registered** — both `SessionEnd` hooks (`vault-session-log.sh`, `vault-auto-backup.sh`) are registered, either by the installed plugin's `hooks/hooks.json` (the normal case: the plugin is the single registration) or by `~/.claude/settings.json`. ✗ if neither; ⚠ if registered in BOTH places (they would run twice: remove the `settings.json` copies).
+4. **Hooks registered** (REQUIRED) — both `SessionEnd` hooks (`vault-session-log.sh`, `vault-auto-backup.sh`) are registered, either by the installed plugin's `hooks/hooks.json` (the normal case: the plugin is the single registration) or by `~/.claude/settings.json`. ✗ if neither; ⚠ if registered in BOTH places (they would run twice: remove the `settings.json` copies).
 
-5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `impeccable`. `ralph-loop`, `cli-anything`, `ponytail`, `claude-mem` are optional since v2.5.0 — report as ℹ, never ✗.
+5. **Plugins installed** — read `~/.claude/plugins/installed_plugins.json`. Confirm: `superpowers`, `frontend-design`, `code-review`, `impeccable` (⚠ per missing one, never ✗; `watch` has its own check 23). `ralph-loop`, `cli-anything`, `ponytail`, `claude-mem` are optional since v2.5.0 — report as ℹ, never ✗.
 
-6. **Caveman installed** (own installer, not plugin) — PASS if ANY of: a `caveman-*.js`/`caveman-*.sh` file exists under `~/.claude/hooks/`, OR a caveman skill dir (`~/.claude/skills/caveman*`), OR a `caveman` reference in `~/.claude/settings.json`. (The `JuliusBrussee/caveman` installer detects each agent and wires itself in — exact artifact names vary by version, so don't hard-match old `caveman-activate.js`.)
+6. **Caveman installed** (own installer, not plugin) — PASS if ANY of: a `caveman-*.js`/`caveman-*.sh` file exists under `~/.claude/hooks/`, OR a caveman skill dir (`~/.claude/skills/caveman*`), OR a `caveman` reference in `~/.claude/settings.json`. (The `JuliusBrussee/caveman` installer detects each agent and wires itself in — exact artifact names vary by version, so don't hard-match old `caveman-activate.js`.) ⚠ if none found (optional).
 
-7. **Design skills** — confirm each file exists: `~/.claude/skills/refactoring-ui/SKILL.md`, `~/.claude/skills/ui-ux-pro-max/SKILL.md`, `~/.claude/skills/hallmark/SKILL.md` (a directory without `SKILL.md` is a failed fetch: ✗ with the name). (`frontend-design` is plugin-level, not listed here.)
+7. **Design skills** — confirm each file exists: `~/.claude/skills/refactoring-ui/SKILL.md`, `~/.claude/skills/ui-ux-pro-max/SKILL.md`, `~/.claude/skills/hallmark/SKILL.md` (a directory without `SKILL.md` is a failed fetch: ⚠ with the name; optional component). (`frontend-design` is plugin-level, not listed here.)
 
-8. **Handoff skill** — `~/.claude/skills/handoff/SKILL.md` exists.
+8. **Handoff skill** — `~/.claude/skills/handoff/SKILL.md` exists (⚠ if missing: it ships bundled, re-run bootstrap STEP 10).
 
 9. **Frameworks** (optional, ⚠ if missing — not ✗):
    - GSD: `~/.claude/get-shit-done/VERSION` exists + `~/.claude/skills/gsd-plan-phase/SKILL.md` present
    - BMAD: per-project installer, not global. Never ✗/⚠ when absent globally: report ℹ "optional, per project (run `npx -y bmad-method install` inside the project)". If `~/.claude/skills/bmad/core/bmad-master/SKILL.md` exists, report ✓.
 
-10. **Vault git repo** — `$VAULT/.git` exists (auto-backup hook no-op without it).
+10. **Vault git repo** — `$VAULT/.git` exists (⚠ if missing: the auto-backup hook is a no-op without it).
 
 11. **Auto-memory dir** — `~/.claude/projects/` exists (claude-mem auto-populates per-project memory dirs on first session).
 
-12. **Graphify** — required part: `graphify` CLI on `$PATH` (`command -v graphify`) + `~/.claude/skills/graphify/` exists (✗ if missing). Optional part: `~/.claude.json` `mcpServers.graphify-vault` (or equivalent) registered (⚠ if missing, never ✗: the MCP is optional). ⚠ if the MCP is registered but `graph.json` doesn't exist yet: user just hasn't run `/graphify .` inside the vault.
+12. **Graphify** — required part: `graphify` CLI on `$PATH` (`command -v graphify`) + `~/.claude/skills/graphify/` exists (⚠ if missing: Graphify is optional). Optional part: `~/.claude.json` `mcpServers.graphify-vault` (or equivalent) registered (⚠ if missing, never ✗: the MCP is optional). ⚠ if the MCP is registered but `graph.json` doesn't exist yet: user just hasn't run `/graphify .` inside the vault.
 
-13. **Power CLI tools** — `command -v` for each: `unclog`, `browser-harness`, `srt`, `gws`, `opencli`. ⚠ (not ✗) for `gws` and `opencli` if the binary is present but unauthenticated — both need a one-time human step (`gws auth setup`; OpenCLI Browser Bridge extension) that the bootstrap deliberately does not attempt.
+13. **Power CLI tools** — `command -v` for each: `unclog`, `browser-harness`, `srt`, `gws`, `opencli`. ⚠ per missing binary (never ✗); also ⚠ for `gws` and `opencli` if the binary is present but unauthenticated — both need a one-time human step (`gws auth setup`; OpenCLI Browser Bridge extension) that the bootstrap deliberately does not attempt.
 
-14. **Fetched audit/video skills** — `~/.claude/skills/browser-harness/SKILL.md` exists; `improve` and `opencli-browser` resolve (either `~/.claude/skills/` or the project `.agents/skills/` dir `npx skills` writes to); at least one `seedance-*` dir present.
+14. **Fetched audit/video skills** — `~/.claude/skills/browser-harness/SKILL.md` exists; `improve` and `opencli-browser` resolve (either `~/.claude/skills/` or the project `.agents/skills/` dir `npx skills` writes to); ALL six Seedance skills have a `SKILL.md`: `seedance-cinematic`, `seedance-motion-design-ad`, `seedance-ecommerce-ad`, `seedance-product-360`, `seedance-social-hook`, `seedance-fashion-lookbook` (a bare directory without `SKILL.md` is a failed fetch). ⚠ per missing item with its name, never ✗.
 
 15. **Dead skill links** — no broken symlinks under `~/.claude/skills/` (`find ~/.claude/skills -maxdepth 2 -type l ! -exec test -e {} \; -print`). A skill dir whose `SKILL.md` points nowhere still shows up in the skill list and wastes a lookup. ✗ if any found, with the paths.
 
@@ -61,6 +61,8 @@ Run the 25 checks in order. For each, print ✓ / ✗ / ⚠ (or ℹ for optional
 
 25. **Reboot hook** — `~/.claude/hooks/reboot-resume.sh` exists + executable, and `~/.claude/settings.json` has a `SessionStart` entry (matcher `clear`) pointing at it (⚠ if either is missing: the `reboot` skill will not auto-resume).
 
+26. **opencli-usage skill** — `opencli-usage` resolves (`~/.claude/skills/opencli-usage/SKILL.md` or the project `.agents/skills/` dir). ⚠ if missing (never ✗): the OpenCLI agent skills install it together with `opencli-browser`.
+
 ## Output format
 
 Print one line per check (grouped as below), then the result line.
@@ -79,9 +81,9 @@ way-stack verify
 ✓ 9  Frameworks         — GSD ✓ · BMAD ℹ optional, per project
 ✓ 10 Vault git          — 12 commits
 ✓ 11 Auto-memory dir    — ~/.claude/projects exists
-✓ 12 Graphify           — CLI + skill ✓ · MCP ⚠ not registered (optional)
+⚠ 12 Graphify           — CLI + skill ✓ · MCP not registered (optional)
 ✓ 13 Power CLI tools    — unclog, browser-harness, srt, gws, opencli
-✓ 14 Fetched skills     — browser-harness, improve, opencli-browser, seedance-*
+✓ 14 Fetched skills     — browser-harness, improve, opencli-browser, 6/6 seedance
 ✓ 15 Dead skill links   — none
 ✓ 16 Cost controls      — env + inventory + grounding kit
 ✓ 17 Orchestrator lean  — 6.1 KB
@@ -93,6 +95,7 @@ way-stack verify
 ✓ 23 Watch plugin       — installed
 ✓ 24 Power skills       — 4/4 SKILL.md present
 ✓ 25 Reboot hook        — installed + registered
+✓ 26 opencli-usage      — skill present
 
-Result: 22 ✓, 3 ⚠, 0 ✗ — mostly healthy. Fix: re-run /way-stack:stack-bootstrap step 9.
+Result: 23 ✓, 3 ⚠, 0 ✗ (26 checks) — mostly healthy. Fix: re-run /way-stack:stack-bootstrap step 9.
 ```
