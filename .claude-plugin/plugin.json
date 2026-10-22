@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "way-stack",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "Meta-plugin that bootstraps a full Claude Code dev stack: lean master orchestrator (head/arms model routing + loop-first mode), PARA + Karpathy LLM Wiki vault, workflow skills (handoff, reboot, dream memory consolidation, session-audit, context-budget, token-budget token management system, council, claudex-loop plan hardening), plus one-command install of 5 upstream plugins (superpowers, frontend-design, code-review, impeccable, watch; ralph-loop, cli-anything, ponytail, claude-mem, mattpocock-skills optional), cost controls (Sonnet subagents, 1M context off, on-demand grounding kit), 3 design skills (refactoring-ui, ui-ux-pro-max, hallmark), graphify knowledge-graph MCP, 2 optional frameworks (GSD, BMAD v6), 6 agent-native CLI tools (unclog, opencli, anydoc, gws, browser-harness, sandbox-runtime), 6 Seedance video skills, behavior hooks (prompt reflexes, opt-in closing guard), 5 opt-in guard hooks (post-edit tests, big-read, compaction thrash, report overwrite, keychain), 2 agents (custodian, silent-failure-hunter), vault-index.",
   "author": {
     "name": "Lucioway",

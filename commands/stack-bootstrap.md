@@ -1,11 +1,19 @@
 ---
 name: stack-bootstrap
-description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + caveman (terse mode) + impeccable (design fluency) + watch (video) (+ optional mattpocock-skills), fetches 3 design skills (incl. hallmark), installs 2 frameworks (GSD, BMAD), bundles 9 workflow skills (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, …), installs the token management system (tracker, context line, cost env vars). Interactive: asks only vault path + framework opt-ins."
+description: "One-shot installer for the full way-stack — creates PARA+Karpathy vault, installs orchestrator CLAUDE.md, registers session hooks, adds upstream marketplaces, installs core plugins + caveman (terse mode) + impeccable (design fluency) + watch (video) (+ optional mattpocock-skills), fetches 3 design skills (incl. hallmark), offers 2 optional frameworks (GSD; BMAD per project), bundles 22 skills (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, …), installs the token management system (tracker, context line, cost env vars). Interactive: asks only vault path + framework opt-ins."
 ---
 
 # /stack-bootstrap — Full Stack Installer
 
-You are the way-stack bootstrap installer. Execute the 14-step install in order. Halt on any error and report which step failed. Never skip verification.
+You are the way-stack bootstrap installer. Execute the 14-step install in order. Never skip verification.
+
+**Error policy (one rule).** REQUIRED steps (1-6: vault, orchestrator, hooks, hook registration) stop on any error: report the step and the exact error, change nothing further. OPTIONAL steps (7-13: marketplaces, plugins, design/power skills, CLIs, frameworks, graphify) print a `⚠` line with the remediation and continue. Step 14 always runs.
+
+**Backups.** Before copying any file into `~/.claude/` that may already exist, back it up if it differs. Define this helper once and re-define it in every shell call that uses it:
+
+```bash
+bk() { [ -f "$2" ] && ! cmp -s "$1" "$2" && cp "$2" "$2.bak-waystack-$(date +%Y%m%d%H%M)"; return 0; }   # bk SRC DST
+```
 
 ## STEP 1 — Ask vault path
 
@@ -36,6 +44,7 @@ Copy `${CLAUDE_PLUGIN_ROOT}/templates/orchestrator-CLAUDE.md` → `~/.claude/CLA
 The template is deliberately lean (it loads into every prompt). The full inventory + cheatsheet ship as a separate on-demand reference, plus the grounding kit:
 
 ```bash
+bk "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md
 cp "${CLAUDE_PLUGIN_ROOT}/references/inventory.md" ~/.claude/way-stack-inventory.md
 [ -f ~/.claude/mcp-grounding.json ] || cp "${CLAUDE_PLUGIN_ROOT}/templates/mcp-grounding.json" ~/.claude/mcp-grounding.json
 mkdir -p ~/.claude/workflows
@@ -47,8 +56,10 @@ mkdir -p ~/.claude/workflows
 
 ```bash
 mkdir -p ~/.claude/hooks
-cp "${CLAUDE_PLUGIN_ROOT}/hooks/vault-session-log.sh" ~/.claude/hooks/
-cp "${CLAUDE_PLUGIN_ROOT}/hooks/vault-auto-backup.sh" ~/.claude/hooks/
+for f in vault-session-log.sh vault-auto-backup.sh; do
+  bk "${CLAUDE_PLUGIN_ROOT}/hooks/$f" ~/.claude/hooks/$f
+  cp "${CLAUDE_PLUGIN_ROOT}/hooks/$f" ~/.claude/hooks/
+done
 chmod +x ~/.claude/hooks/vault-*.sh
 ```
 
@@ -56,15 +67,13 @@ Patch `$VAULT` path into both scripts (replace `__VAULT_PATH__` placeholder with
 
 ## STEP 6 — Register hooks in settings.json
 
+The two SessionEnd hooks (`vault-session-log.sh`, `vault-auto-backup.sh`) are registered by the plugin itself (`hooks/hooks.json`) and point at the copies in `~/.claude/hooks/` made in STEP 5. Do NOT add them to `settings.json` too: they would run twice. Only the reboot hook needs a settings entry.
+
 Read `~/.claude/settings.json` (create empty `{}` if absent). Merge in:
 
 ```json
 {
   "hooks": {
-    "SessionEnd": [
-      { "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/vault-session-log.sh" }] },
-      { "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/vault-auto-backup.sh" }] }
-    ],
     "SessionStart": [
       { "matcher": "clear", "hooks": [{ "type": "command", "command": "$HOME/.claude/hooks/reboot-resume.sh" }] }
     ]
@@ -75,10 +84,11 @@ Read `~/.claude/settings.json` (create empty `{}` if absent). Merge in:
 Also copy the reboot hook (used by the bundled `reboot` skill):
 
 ```bash
+bk "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/reboot-resume.sh
 cp "${CLAUDE_PLUGIN_ROOT}/hooks/reboot-resume.sh" ~/.claude/hooks/ && chmod +x ~/.claude/hooks/reboot-resume.sh
 ```
 
-Preserve existing hooks — append, don't replace. Use `jq` if available.
+Preserve existing hooks — append, don't replace. Use `jq` if available. Back up `settings.json` first (`cp ~/.claude/settings.json ~/.claude/settings.json.bak-waystack-$(date +%Y%m%d%H%M)`).
 
 Also merge the two cost-control env vars (ask before overwriting an existing value):
 
@@ -105,7 +115,9 @@ Install the `token-budget` scripts, register the per-turn context line, schedule
 
 ```bash
 mkdir -p ~/.claude/token-budget/bin
-cp "${CLAUDE_PLUGIN_ROOT}/skills/token-budget/scripts/"* ~/.claude/token-budget/bin/
+for f in "${CLAUDE_PLUGIN_ROOT}/skills/token-budget/scripts/"*; do
+  bk "$f" ~/.claude/token-budget/bin/$(basename "$f"); cp "$f" ~/.claude/token-budget/bin/
+done
 chmod +x ~/.claude/token-budget/bin/*
 ```
 
@@ -130,8 +142,9 @@ Finally record the starting point so later diets have a number to beat:
 
 ```bash
 mkdir -p ~/.claude/hooks
+bk "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py
 cp "${CLAUDE_PLUGIN_ROOT}/hooks/closing-guard.py" ~/.claude/hooks/closing-guard.py
-cp ~/.claude/settings.json ~/.claude/settings.json.bak-$(date +%s) 2>/dev/null
+cp ~/.claude/settings.json ~/.claude/settings.json.bak-waystack-$(date +%Y%m%d%H%M) 2>/dev/null
 python3 - <<'PY'
 import json, os
 p = os.path.expanduser("~/.claude/settings.json")
@@ -166,8 +179,9 @@ For each one the user picks:
 ```bash
 H=post-edit-test.py; EV=PostToolUse; M='Edit|Write|MultiEdit'      # set per hook from the table
 mkdir -p ~/.claude/hooks
+bk "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H
 cp "${CLAUDE_PLUGIN_ROOT}/hooks/$H" ~/.claude/hooks/$H
-cp ~/.claude/settings.json ~/.claude/settings.json.bak-$(date +%s) 2>/dev/null
+cp ~/.claude/settings.json ~/.claude/settings.json.bak-waystack-$(date +%Y%m%d%H%M) 2>/dev/null
 H="$H" EV="$EV" M="$M" python3 - <<'PY'
 import json, os
 p = os.path.expanduser("~/.claude/settings.json")
@@ -278,8 +292,11 @@ for s in refactoring-ui; do
 done
 
 # ui-ux-pro-max
-[ ! -d ui-ux-pro-max ] && git clone --depth 1 \
-  https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git ui-ux-pro-max
+# the skill lives at .claude/skills/ui-ux-pro-max/ inside the repo — clone temp, move the nested skill dir (with its resources) out
+if [ ! -d ui-ux-pro-max ]; then
+  git clone --depth 1 https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git .tmp-uiux && \
+  mv .tmp-uiux/.claude/skills/ui-ux-pro-max ./ui-ux-pro-max && rm -rf .tmp-uiux
+fi
 
 # hallmark — anti-AI-slop structural variety for landing/app pages (nutlope)
 # skill lives in the repo's skills/ subdir — clone temp, move skill out
@@ -296,14 +313,16 @@ Then three third-party power skills (fetched, not vendored):
 [ ! -d qa-test ] && git clone --depth 1 https://github.com/adampaulwalker/qa-test.git qa-test && rm -rf qa-test/.git
 
 # agent-browser — browser automation CLI for agents (Vercel Labs)
-[ ! -d agent-browser ] && npx -y agent-browser@latest install 2>/dev/null || echo "agent-browser: install manually — https://github.com/vercel-labs/agent-browser"
+# `agent-browser install` fetches the browser only; the second line installs the Claude skill itself
+npx -y agent-browser@latest install 2>/dev/null || echo "⚠ agent-browser: install manually — https://github.com/vercel-labs/agent-browser"
+npx -y skills@latest add vercel-labs/agent-browser --skill agent-browser -g -a claude-code -y || echo "⚠ agent-browser skill: install manually"
 
 # agent-reach — multi-platform internet research (15 channels: Reddit, X, YouTube, LinkedIn, …)
 [ ! -d agent-reach ] && git clone --depth 1 https://github.com/Panniantong/Agent-Reach.git .tmp-reach && \
   { mv .tmp-reach/skills/agent-reach ./agent-reach 2>/dev/null || mv .tmp-reach ./agent-reach; rm -rf .tmp-reach; }
 ```
 
-If `git clone` fails (repo moved / renamed), log warning and continue — don't halt.
+If `git clone` fails (repo moved / renamed), print a `⚠` warning and continue (optional step, see the error policy).
 
 ## STEP 9b — Power CLI tools (agent-native surfaces)
 
@@ -344,10 +363,10 @@ Then the fetched skill sets:
 
 ```bash
 # opencli agent skills — the core two (adapter/sitemap authors on demand)
-npx -y skills@latest add jackwener/opencli --skill opencli-browser --skill opencli-usage
+npx -y skills@latest add jackwener/opencli --skill opencli-browser --skill opencli-usage -g -a claude-code -y
 
 # improve — strong model audits the codebase, cheap model executes the written plan
-npx -y skills@latest add shadcn/improve
+npx -y skills@latest add shadcn/improve -g -a claude-code -y
 ```
 
 And the Seedance 2.0 x Higgsfield video skills — 6 of 15, the ones that apply to
@@ -375,6 +394,7 @@ The `handoff` skill writes `HANDOFF.md` so a fresh-context agent can resume work
 
 ```bash
 mkdir -p ~/.claude/skills/handoff
+bk "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md
 cp "${CLAUDE_PLUGIN_ROOT}/templates/skills/handoff/SKILL.md" ~/.claude/skills/handoff/SKILL.md
 ```
 
@@ -401,9 +421,9 @@ And six engineering-craft skills, also bundled in the plugin:
 
 ## STEP 11 — Install frameworks (optional, ask once per framework)
 
-Frameworks are heavyweight (50–100+ skills each). Ask the user which to install. Default = ALL.
+Frameworks are heavyweight (50–100+ skills each). Ask the user which to install.
 
-> Install frameworks? GSD, BMAD — pick either/both/none. (default: both)
+> Install frameworks? GSD (global) and/or BMAD (per project, see 11b) — pick either/both/none. (default: GSD)
 
 ### 11a — GSD (Get-Shit-Done) — gsd-build/get-shit-done
 
@@ -414,16 +434,18 @@ npx -y get-shit-done-cc --claude --global
 
 Installs `~/.claude/get-shit-done/` runtime + `~/.claude/skills/gsd-*/` (**90+ skills** as of 2026-05) + `~/.claude/agents/gsd-*` agents + GSD hooks (`gsd-check-update.js`, `gsd-session-state.sh`, `gsd-context-monitor.js`, `gsd-phase-boundary.sh`, `gsd-prompt-guard.js`, `gsd-read-guard.js`, `gsd-workflow-guard.js`, `gsd-validate-commit.sh`). Adds `/gsd-*` slash commands.
 
-### 11b — BMAD-METHOD v6 — bmad-code-org/BMAD-METHOD
+### 11b — BMAD-METHOD v6 — bmad-code-org/BMAD-METHOD (per project)
+
+BMAD's installer is per project, not global. Do not run it from the bootstrap: tell the user to run it later, inside each project folder where they want BMAD:
 
 ```bash
-# Requires Node.js 20+
+# Requires Node.js 20+; run inside the project folder
 npx -y bmad-method install
 ```
 
-Interactive installer. Pick `Claude Code` as host when prompted. Installs `~/.claude/skills/bmad/{core,bmm,bmb,cis}/` (15 `bmad:*` skills) + `bmad:*` slash commands.
+Interactive installer. Pick `Claude Code` as host when prompted. It writes the `bmad` skills and `bmad:*` slash commands into that project. `/stack-verify` reports BMAD as optional info.
 
-If any framework install fails, log warning and continue — orchestrator template handles missing frameworks gracefully (marked "if installed").
+If a framework install fails, print a `⚠` warning and continue — orchestrator template handles missing frameworks gracefully (marked "if installed").
 
 ## STEP 12 — Scaffold auto-memory directory
 
@@ -491,7 +513,7 @@ If `claude mcp add` is not yet available in the installed CLI version, instead p
 
 ## STEP 14 — Verify install
 
-Run `/stack-verify`. Report pass/fail summary to user:
+Run `/way-stack:stack-verify` (or `/stack-verify` if it shows in the menu). Report pass/fail summary to user:
 
 ```
 ✓ Vault created at <path>
@@ -502,14 +524,15 @@ Run `/stack-verify`. Report pass/fail summary to user:
 ✓ 3 design skills fetched (refactoring-ui, ui-ux-pro-max, hallmark)
 ✓ 2 agents installed (custodian, silent-failure-hunter)
 ✓ 3 power skills fetched (qa-test, agent-browser, agent-reach)
-✓ 14 skills bundled (handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill)
-✓ Frameworks: GSD ✓ BMAD ✓
-✓ Graphify CLI + skill + MCP server registered
+✓ 22 skills bundled (21 in the plugin's skills/ + handoff: handoff, reboot, dream, session-audit, context-budget, token-budget, council, claudex-loop, agent-harness-construction, click-path-audit, regex-vs-llm-structured-text, loop-design-check, skill-stocktake, rules-distill, vault-*, skillspector, …)
+✓ Frameworks (if chosen): GSD ✓ — BMAD is per project, run it inside the project
+✓ Graphify CLI + skill (+ MCP server, if chosen)
 ⚠ 1 skill failed (nextlevelbuilder moved) — install manually
 ```
 
 ## Error handling
 
+- Required steps (1-6) stop on failure; optional steps (7-13) warn and continue (see the error policy at the top)
 - Any step that fails → print which step + exact error + remediation hint
 - Never rollback automatically — user's files are sacred
 - Idempotent: re-running `/stack-bootstrap` must be safe

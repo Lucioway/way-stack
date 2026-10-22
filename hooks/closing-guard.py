@@ -2,11 +2,11 @@
 """Claude Code Stop hook (OPT-IN): enforce the orchestrator's closing summary.
 
 Work turn = at least one tool_use after the last real user message. Then:
-  (a) final text (after the last tool call) lacks the "✅ Done" marker -> block once;
+  (a) final text (after the last tool call) lacks the "✅ Done" marker (or its Italian form "✅ Fatto") -> block once;
   (b) a closing LINE asks the user for a go-ahead/choice on reversible work, and that same line
       names no real gate (ads, messages to people, deploy, money, deletion, accounts, sign-off,
       creative taste) -> block once. Fenced code blocks and quoted passages are examples, not asks;
-      only a blockquote that carries the closing (✅ Done / 👉 Now) is still judged.
+      only a blockquote that carries the closing (✅ Done / 👉 Now, or ✅ Fatto / 👉 Ora) is still judged.
 stop_hook_active -> pass (no loops). Headless runs (entrypoint sdk*) -> pass. Missing transcript -> pass.
 
 Test:  python3 closing-guard.py --test <transcript.jsonl>     python3 closing-guard.py --selftest
@@ -19,10 +19,11 @@ from itertools import groupby
 from pathlib import Path
 
 MARK = "✅ Done"
+MARKS = ("✅ Done", "✅ Fatto")   # either language passes
 REASON = (
     "The mandatory closing is missing. Add, after a blank line and `---`, in plain everyday words: "
     "`> **✅ Done** — 2-6 bullets, each a TRUE change (file, service, account, money; failures stated)`; "
-    "`> **👉 Now** — 0-4 bullets, only things that need the user's hand, else `nothing, you're set``."
+    "`> **👉 Now** — 0-4 bullets, only things that need the user's hand, else `nothing, you're set``. (The Italian form `✅ Fatto` / `👉 Ora` is accepted too.)"
 )
 
 # Closing lines that hand back work Claude could finish itself.
@@ -66,7 +67,7 @@ QUOTE = re.compile(r"^\s*(?:>\s?)+")
 
 def closing_lines(text: str):
     """Lines the go-ask rule judges. Sentinel I-46221b: fenced code blocks and quoted passages are examples,
-    not asks. A blockquote that carries the closing (✅ Done / 👉 Now) is NOT a quoted passage: its bullets
+    not asks. A blockquote that carries the closing (✅ Done / 👉 Now / ✅ Fatto / 👉 Ora) is NOT a quoted passage: its bullets
     are exactly where a generic 'say go' lands, so they stay judged.
     Like a markdown renderer: a fence is opened by 0-3 spaces of indent, an unclosed fence runs to the end,
     except one opened inside a quote, which ends with that quote; a fence outside any quote splits the quotes
@@ -91,7 +92,7 @@ def closing_lines(text: str):
             kept.append(ln)
     for is_quote, grp in groupby(kept, key=lambda ln: ln.lstrip().startswith(">")):
         run = list(grp)                    # one blockquote = consecutive '>' lines
-        if not is_quote or any(MARK in q or "👉" in q for q in run):
+        if not is_quote or any(any(m in q for m in MARKS) or "👉" in q for q in run):
             yield from run
 
 
@@ -160,7 +161,7 @@ def decide(payload: dict) -> dict:
         had_tool, text = last_turn(Path(p))
     except Exception:
         return {}
-    if had_tool and MARK not in text:
+    if had_tool and not any(m in text for m in MARKS):
         return {"decision": "block", "reason": REASON}
     if had_tool and unjustified_go_ask(text):
         return {"decision": "block", "reason": GO_REASON}
@@ -189,11 +190,36 @@ def selftest() -> int:
     assert not unjustified_go_ask("> Say go and I will fix it.\n```text\nexample\n```\n> **✅ Done**")
     assert unjustified_go_ask("✅ Done\n\n    ```\nSay go and I will fix it.")
     assert unjustified_go_ask("> ```\n> example\n\n✅ Done\nSay go and I will fix it.")
+    # Italian closing form is accepted like the English one
+    assert not unjustified_go_ask("Example:\n```\nSay go and I will fix it.\n```\n> **✅ Fatto**")
+    assert not unjustified_go_ask("> Say go and I will fix it.\n\n> **✅ Fatto**\n> - fixed")
+    assert unjustified_go_ask("> **✅ Fatto**\n> - fixed\n>\n> **👉 Ora**\n> - Say go and I will fix it.")
+    import tempfile
+    _made = []
+    def _t(txt):
+        with tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False) as f:
+            f.write(json.dumps({"type": "user", "message": {"role": "user", "content": "x"}}) + "\n")
+            f.write(json.dumps({"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "tool_use", "id": "1", "name": "Bash", "input": {}}]}}) + "\n")
+            f.write(json.dumps({"type": "assistant", "message": {"role": "assistant", "content": [
+                {"type": "text", "text": txt}]}}) + "\n")
+        _made.append(f.name)
+        return f.name
+    _env = os.environ.pop("CLAUDE_CODE_ENTRYPOINT", None)
+    try:
+        assert decide({"transcript_path": _t("done\n\n---\n> **✅ Fatto**\n> - ok")}) == {}
+        assert decide({"transcript_path": _t("done\n\n---\n> **✅ Done**\n> - ok")}) == {}
+        assert decide({"transcript_path": _t("done, no closing")}).get("decision") == "block"
+    finally:
+        for _f in _made:
+            os.unlink(_f)
+        if _env is not None:
+            os.environ["CLAUDE_CODE_ENTRYPOINT"] = _env
     assert decide({"stop_hook_active": True}) == {}
     assert decide({}) == {}
     assert decide([]) == {}
     assert decide({"transcript_path": 5}) == {}
-    print("selftest ok:", len(bad) + len(good) + 10, "asserts")
+    print("selftest ok:", len(bad) + len(good) + 19, "asserts")
     return 0
 
 

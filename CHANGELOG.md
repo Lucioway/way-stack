@@ -2,6 +2,15 @@
 
 All notable changes to way-stack are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## 2.7.1 — 2026-10-22 — fixes from external review
+
+- **closing-guard** accepts the Italian closing (`✅ Fatto` / `👉 Ora`) as well as `✅ Done` / `👉 Now`; selftest extended (35 asserts).
+- **SessionEnd hooks registered once:** the plugin `hooks.json` is the single registration; STEP 6 no longer writes them into `settings.json`, and `/stack-verify` check 4 accepts plugin registration (⚠ if registered twice).
+- **Bootstrap:** ui-ux-pro-max now clones to a temp dir and moves the nested skill folder; agent-browser installs its Claude skill, not only the browser; `skills add` commands get `-g -a claude-code -y`; BMAD is described as per-project; one error policy (required steps stop, optional steps warn and continue); backup helper (`bk`) before overwriting files in `~/.claude/`; skill counts corrected (22 bundled); frameworks/MCP shown "if chosen".
+- **/stack-verify:** design skills checked by `SKILL.md`; BMAD absent = info; Graphify CLI required, MCP optional; new checks 23-25 (watch plugin, power skills, reboot hook) at WARN level, now 25 checks; output example moved to the end and lists every check.
+- **Docs:** namespaced commands (`/way-stack:stack-bootstrap`, `/way-stack:stack-verify`) in README and bootstrap; custodian "weekly if you schedule it (optional)".
+- **Sanitize:** removed a personal label and an old handle from skill and CHANGELOG text.
+
 ## v2.7.0 — Guards, agents, orchestrator v2 (2026-10-22)
 
 Sync-with-reality release, sixteen days after v2.6.1. What changed on the reference machine and held up in daily use is shipped here, stripped of anything personal.
@@ -261,7 +270,7 @@ v1.1.0 install flow had two broken marketplace references and missed the two mos
 - README "What you get" + "Upstream dependencies" sections list new plugins/frameworks
 - Bootstrap is now an 11-step flow (was 10)
 - Plugin description updated: "6 plugins" + "3 frameworks"
-- README install line corrected: `Lucioway/way-stack` (was `lcwy9671/way-stack` — wrong owner)
+- README install line corrected to the right GitHub owner, `Lucioway`
 
 ### Why
 Goal: a single link that replicates the entire operational Claude stack on a fresh machine. v1.0.x covered orchestrator + vault + 5 plugins + design skills, but missed the three frameworks (GSD/BMAD/gstack) that the orchestrator routes to. Replica was incomplete.
@@ -273,7 +282,7 @@ Goal: a single link that replicates the entire operational Claude stack on a fre
 - `CHANGELOG.md` — this file
 
 ### Fixed
-- Corrected GitHub owner from `lcwy9671` to `Lucioway` in `plugin.json` and `marketplace.json`
+- Corrected the GitHub owner to `Lucioway` in `plugin.json` and `marketplace.json`
 
 ## v1.0.0 — 2026-04-24
 

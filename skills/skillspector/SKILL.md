@@ -83,7 +83,7 @@ Summarise: risk score, the top high/critical findings (category + file:line + wh
 and a clear verdict — **safe / review-needed / do-not-install**. For audits before
 publishing, list each finding the author should fix.
 
-## Lucio note
+## Note
 
 Use this on anything pulled from a third-party marketplace before it lands in
 `~/.claude/skills` or `~/.claude/plugins`. The local install lives at

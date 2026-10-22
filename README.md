@@ -20,7 +20,7 @@ Designed to replicate a complete Claude Code "pro" setup on any fresh machine in
 | **Workflow skills (bundled)** | **handoff** (HANDOFF.md), **reboot** (handoff → /clear → auto-resume), **dream** (memory consolidation), **session-audit** (find missing skills monthly), **context-budget** (context-cost audit), **token-budget** (token management system: tracker + context line + baseline + diet), **council** (4-voice decision panel), **claudex-loop** (plan hardening w/ adversarial Codex review) |
 | **Model routing** | Head/arms: the strongest model stays the main session (never told to switch with `/model`); every delegable job goes to a cheap-model subagent under a fixed contract — one narrow job, ≤40 turns, result on file, ≤15-line return |
 | **Guard hooks (v2.7.0, opt-in)** | `post-edit-test` (runs the nearest test after an edit, silent on pass), `big-read-guard` (stops whole-file reads of huge files), `compact-counter` (catches autocompact thrash), `no-overwrite-reports`, `keychain-guard` (macOS) |
-| **Agents (v2.7.0)** | `custodian` (weekly audit of the orchestrator + memory: dead lines, duplicates, broken links, index over budget — mechanical fixes only) and `silent-failure-hunter` (finds swallowed errors and bad fallbacks) |
+| **Agents (v2.7.0)** | `custodian` (audit of the orchestrator + memory: dead lines, duplicates, broken links, index over budget — mechanical fixes only; weekly if you schedule it, optional) and `silent-failure-hunter` (finds swallowed errors and bad fallbacks) |
 | **Hook-based add-ons** | caveman (terse mode) — installs SessionStart + UserPromptSubmit hooks via its own installer |
 | **Knowledge-graph layer** | **graphify** — `/graphify .` builds a graph from any folder of `.md`/`.json`/code. Queryable from Claude via MCP (`query_graph`, `shortest_path`, `god_nodes`, `get_neighbors`). Replaces hand-curated wikilinks with analytical traversal. |
 | **Design skills fetched** | refactoring-ui, ui-ux-pro-max, **hallmark** (ux-heuristics + ios-hig-design dropped in v2.4.0 — never invoked in a year of use) |
@@ -45,15 +45,17 @@ In Claude Code:
 ### 2. Bootstrap the stack
 
 ```
-/stack-bootstrap
+/way-stack:stack-bootstrap
 ```
 
-It will ask once where your vault should live (default `~/Workspace`), then install everything. Asks once whether to install the heavyweight frameworks (GSD/BMAD) — default = both.
+Plugin commands are always reachable under the plugin namespace; the short form `/stack-bootstrap` works too if it shows in your menu.
+
+It will ask once where your vault should live (default `~/Workspace`), then install everything. Asks once whether to install the heavyweight frameworks: GSD (global) and/or BMAD (its installer is per project, so run it inside the project folder). Default = GSD.
 
 ### 3. Verify
 
 ```
-/stack-verify
+/way-stack:stack-verify
 ```
 
 Expected: all ✓. Any ⚠ includes a fix hint.
@@ -77,7 +79,7 @@ Once bootstrapped, every request is routed by the orchestrator. Examples:
 ```
 way-stack/
 ├── .claude-plugin/plugin.json
-├── commands/              # /stack-bootstrap, /stack-verify, /stack-publish, /caveman-commit
+├── commands/              # /way-stack:stack-bootstrap, :stack-verify, :stack-publish, :caveman-commit
 ├── skills/                # deploy-project, shinen-design, vault-{ingest,query,lint}, workflow + craft skills
 ├── hooks/                 # session log + auto-backup
 ├── templates/             # orchestrator CLAUDE.md, vault CLAUDE.md, project CLAUDE.md,
@@ -88,7 +90,7 @@ way-stack/
 └── LICENSE                # MIT
 ```
 
-## Upstream dependencies (fetched by `/stack-bootstrap`)
+## Upstream dependencies (fetched by `/way-stack:stack-bootstrap`)
 
 | Dependency | Source | Purpose |
 |---|---|---|

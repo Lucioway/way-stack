@@ -27,11 +27,11 @@ Reference file, read on demand. The orchestrator (`~/.claude/CLAUDE.md`) points 
 
 ## Behavior hooks
 - **prompt-reflex** (UserPromptSubmit, auto-registered by the plugin) — image path in prompt → Read it first; short status ping → answer in text now, no tools first.
-- **closing-guard** (Stop, OPT-IN via `/stack-bootstrap` STEP 6c) — blocks a work turn that lacks the `✅ Done` closing or ends with a needless "say go" permission-ask.
+- **closing-guard** (Stop, OPT-IN via `/stack-bootstrap` STEP 6c) — blocks a work turn that lacks the `✅ Done` (or Italian `✅ Fatto`) closing or ends with a needless "say go" permission-ask.
 - **Guards (OPT-IN, STEP 6d)** — `post-edit-test` (tests next to an edited file, silent on pass), `big-read-guard` (no whole-file reads of big files), `compact-counter` (autocompact thrash), `no-overwrite-reports`, `keychain-guard` (macOS). Pattern: ⛔ line in CLAUDE.md + PreToolUse hook that denies.
 
 ## Agents (plugin `agents/` dir, loaded automatically)
-- **custodian** — weekly audit of the orchestrator + memory (budget, broken links, duplicates, dead refs); mechanical fixes only.
+- **custodian** — audit of the orchestrator + memory (weekly if you schedule it, optional) (budget, broken links, duplicates, dead refs); mechanical fixes only.
 - **silent-failure-hunter** — read-only hunt for swallowed errors and bad fallbacks.
 
 ## CLI tools
