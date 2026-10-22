@@ -169,7 +169,7 @@ PY
 python3 ~/.claude/hooks/closing-guard.py --selftest
 ```
 
-If no, skip; `/stack-verify` reports it as ⚠ (not ✗).
+If no, skip; `/way-stack:stack-verify` reports it as ⚠ (not ✗).
 
 - **vault-index** (optional): offer to schedule `skills/vault-index/scripts/vault_index.py --vault "$VAULT"` weekly (cron one-liner in the skill). Run it once now with `--dry`, then for real.
 
@@ -459,7 +459,7 @@ BMAD's installer is per project, not global. Do not run it from the bootstrap: t
 npx -y bmad-method install
 ```
 
-Interactive installer. Pick `Claude Code` as host when prompted. It writes the `bmad` skills and `bmad:*` slash commands into that project. `/stack-verify` reports BMAD as optional info.
+Interactive installer. Pick `Claude Code` as host when prompted. It writes the `bmad` skills and `bmad:*` slash commands into that project. `/way-stack:stack-verify` reports BMAD as optional info.
 
 If a framework install fails, print a `⚠` warning and continue — orchestrator template handles missing frameworks gracefully (marked "if installed").
 
@@ -533,7 +533,7 @@ Run `/way-stack:stack-verify`, then print ONE summary line per step (1-13), usin
 
 - `✓` = the step completed and was checked; `⚠` = optional step failed or was skipped (give the remediation); `✗` = required step failed (the run already stopped there).
 - Name the real artifacts: vault path, plugins actually installed, design/power skills actually fetched (and any that failed), frameworks only if chosen, Graphify CLI + skill (+ MCP only if chosen), closing-guard and other guards only if opted in.
-- End with the `/stack-verify` result line (counts of ✓ / ⚠ / ✗) and the manual follow-ups (`gws auth setup`, OpenCLI Browser Bridge).
+- End with the `/way-stack:stack-verify` result line (counts of ✓ / ⚠ / ✗) and the manual follow-ups (`gws auth setup`, OpenCLI Browser Bridge).
 
 Example shape (illustrative only; the content comes from the actual run):
 
@@ -548,4 +548,4 @@ Example shape (illustrative only; the content comes from the actual run):
 - Required steps (1-6): retry once, then stop and explain. Optional steps (7-13): print `⚠` and continue (see the error policy at the top)
 - Any step that fails → print which step + exact error + remediation hint
 - Never rollback automatically — user's files are sacred
-- Idempotent: re-running `/stack-bootstrap` must be safe
+- Idempotent: re-running `/way-stack:stack-bootstrap` must be safe

@@ -12,9 +12,9 @@ Publish a new version of the way-stack plugin repo. Handles version bump, change
 `$ARGUMENTS` = `<version> <description>`
 
 Examples:
-- `/stack-publish 1.1.0 "add new agent-refine command"`
-- `/stack-publish 1.0.1 "fix vault path detection on Linux"`
-- `/stack-publish 2.0.0 "BREAKING: rename /agent-* to /sdd-*"`
+- `/way-stack:stack-publish 1.1.0 "add new agent-refine command"`
+- `/way-stack:stack-publish 1.0.1 "fix vault path detection on Linux"`
+- `/way-stack:stack-publish 2.0.0 "BREAKING: rename /agent-* to /sdd-*"`
 
 Version must follow semver (MAJOR.MINOR.PATCH). Description goes into commit message + CHANGELOG.
 
