@@ -5,7 +5,8 @@ Work turn = at least one tool_use after the last real user message. Then:
   (a) final text (after the last tool call) lacks the "✅ Done" marker -> block once;
   (b) a closing LINE asks the user for a go-ahead/choice on reversible work, and that same line
       names no real gate (ads, messages to people, deploy, money, deletion, accounts, sign-off,
-      creative taste) -> block once.
+      creative taste) -> block once. Fenced code blocks and quoted passages are examples, not asks;
+      only a blockquote that carries the closing (✅ Done / 👉 Now) is still judged.
 stop_hook_active -> pass (no loops). Headless runs (entrypoint sdk*) -> pass. Missing transcript -> pass.
 
 Test:  python3 closing-guard.py --test <transcript.jsonl>     python3 closing-guard.py --selftest
@@ -14,6 +15,7 @@ import json
 import os
 import re
 import sys
+from itertools import groupby
 from pathlib import Path
 
 MARK = "✅ Done"
@@ -57,9 +59,45 @@ GO_REASON = (
 )
 
 
+FENCE_OPEN = re.compile(r"^ {0,3}(?:(`{3,})[^`]*|(~{3,}).*)$")   # 4+ spaces or a tab = indented code, not a fence
+FENCE_CLOSE = re.compile(r"^ {0,3}(`{3,}|~{3,})\s*$")
+QUOTE = re.compile(r"^\s*(?:>\s?)+")
+
+
+def closing_lines(text: str):
+    """Lines the go-ask rule judges. Sentinel I-46221b: fenced code blocks and quoted passages are examples,
+    not asks. A blockquote that carries the closing (✅ Done / 👉 Now) is NOT a quoted passage: its bullets
+    are exactly where a generic 'say go' lands, so they stay judged.
+    Like a markdown renderer: a fence is opened by 0-3 spaces of indent, an unclosed fence runs to the end,
+    except one opened inside a quote, which ends with that quote; a fence outside any quote splits the quotes
+    around it in two."""
+    kept, fence, quoted = [], None, False
+    for ln in text.splitlines():
+        qm = QUOTE.match(ln)
+        body = ln[qm.end():] if qm else ln   # a fence can sit inside a blockquote: look at it without the '>'
+        if fence and quoted and not qm:      # the quote that held the fence is over, so is the fence
+            fence = None
+        if fence:                            # inside a fenced block: skip until the matching close
+            m = FENCE_CLOSE.match(body)
+            if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence):
+                fence = None
+            continue
+        m = FENCE_OPEN.match(body)
+        if m:
+            fence, quoted = m.group(1) or m.group(2), bool(qm)
+            if not qm:
+                kept.append("")              # a hole where the fence was: the quotes around it must not fuse
+        else:
+            kept.append(ln)
+    for is_quote, grp in groupby(kept, key=lambda ln: ln.lstrip().startswith(">")):
+        run = list(grp)                    # one blockquote = consecutive '>' lines
+        if not is_quote or any(MARK in q or "👉" in q for q in run):
+            yield from run
+
+
 def unjustified_go_ask(text: str) -> bool:
-    """True if some line asks for a go/choice without naming a real gate on the same line."""
-    return any(GO_ASK.search(ln) and not GATE.search(ln) for ln in text.splitlines())
+    """True if some judged line asks for a go/choice without naming a real gate on the same line."""
+    return any(GO_ASK.search(ln) and not GATE.search(ln) for ln in closing_lines(text))
 
 
 def last_turn(path: Path):
@@ -144,11 +182,18 @@ def selftest() -> int:
         assert unjustified_go_ask(t), ("should flag", t)
     for t in good:
         assert not unjustified_go_ask(t), ("should pass", t)
+    # Sentinel I-46221b: code fences / quoted passages are examples; the closing blockquote is still judged
+    assert not unjustified_go_ask("Example:\n```\nSay go and I will fix it.\n```\n> **✅ Done**")
+    assert not unjustified_go_ask("> Say go and I will fix it.\n\n> **✅ Done**\n> - fixed")
+    assert unjustified_go_ask("> **✅ Done**\n> - fixed\n>\n> **👉 Now**\n> - Say go and I will fix it.")
+    assert not unjustified_go_ask("> Say go and I will fix it.\n```text\nexample\n```\n> **✅ Done**")
+    assert unjustified_go_ask("✅ Done\n\n    ```\nSay go and I will fix it.")
+    assert unjustified_go_ask("> ```\n> example\n\n✅ Done\nSay go and I will fix it.")
     assert decide({"stop_hook_active": True}) == {}
     assert decide({}) == {}
     assert decide([]) == {}
     assert decide({"transcript_path": 5}) == {}
-    print("selftest ok:", len(bad) + len(good) + 4, "asserts")
+    print("selftest ok:", len(bad) + len(good) + 10, "asserts")
     return 0
 
 
